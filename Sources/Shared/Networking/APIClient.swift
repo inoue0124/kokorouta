@@ -48,6 +48,8 @@ final class APIClient: Sendable {
 
     private func mapError(_ error: NSError) -> NetworkError {
         switch error.code {
+        case FunctionsErrorCode.invalidArgument.rawValue:
+            .invalidArgument(message: error.localizedDescription)
         case FunctionsErrorCode.unauthenticated.rawValue:
             .unauthorized
         case FunctionsErrorCode.unavailable.rawValue:

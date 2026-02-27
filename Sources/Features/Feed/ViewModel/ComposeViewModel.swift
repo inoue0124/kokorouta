@@ -50,7 +50,7 @@ final class ComposeViewModel {
     }
 
     var isValid: Bool {
-        selectedCategory != nil && characterCount >= 10 && characterCount <= 200
+        selectedCategory != nil && characterCount >= 10 && characterCount <= 300
     }
 
     var validationMessage: String? {
@@ -101,5 +101,9 @@ final class ComposeViewModel {
 
     func retry() async {
         await submitTanka()
+    }
+
+    func resetToInput() {
+        phase = .input
     }
 }

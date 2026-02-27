@@ -7,4 +7,5 @@ enum NetworkError: Error, Sendable {
     case decodingError
     case unauthorized
     case rateLimited
+    case invalidArgument(message: String)
 }

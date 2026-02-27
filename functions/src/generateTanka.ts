@@ -7,6 +7,31 @@ const openaiApiKey = defineSecret("OPENAI_API_KEY");
 
 const VALID_CATEGORIES = ["relationship", "love", "work", "health", "other"];
 
+function validateWorryText(text: string): void {
+  const trimmed = text.trim();
+
+  if (trimmed.length === 0) {
+    throw new HttpsError("invalid-argument", "悩みのテキストを入力してください。");
+  }
+
+  if (trimmed.length < 10) {
+    throw new HttpsError("invalid-argument", "もう少し詳しく悩みを書いてください。");
+  }
+
+  if (trimmed.length > 300) {
+    throw new HttpsError("invalid-argument", "悩みは300文字以内で入力してください。");
+  }
+
+  const charFrequency = new Map<string, number>();
+  for (const char of trimmed) {
+    charFrequency.set(char, (charFrequency.get(char) || 0) + 1);
+  }
+  const maxFrequency = Math.max(...charFrequency.values());
+  if (maxFrequency / trimmed.length >= 0.7) {
+    throw new HttpsError("invalid-argument", "悩みの内容を具体的に書いてください。");
+  }
+}
+
 export const generateTanka = onCall(
   {
     region: "asia-northeast1",
@@ -27,9 +52,11 @@ export const generateTanka = onCall(
       );
     }
 
-    if (!worryText || typeof worryText !== "string" || worryText.trim().length === 0) {
+    if (!worryText || typeof worryText !== "string") {
       throw new HttpsError("invalid-argument", "悩みのテキストを入力してください。");
     }
+
+    validateWorryText(worryText);
 
     const db = admin.firestore();
     const userRef = db.collection("users").doc(uid);
@@ -61,14 +88,20 @@ export const generateTanka = onCall(
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
+      response_format: { type: "json_object" },
       messages: [
         {
           role: "system",
           content:
             "あなたは日本の短歌の名人です。ユーザーの悩みに寄り添い、" +
-            "心を癒す美しい短歌（五七五七七の31音）を一首だけ詠んでください。" +
-            "短歌のテキストのみを返してください。説明や注釈は不要です。" +
-            "各句の間には改行を入れてください（例: 五文字\\n七文字\\n五文字\\n七文字\\n七文字）。",
+            "心を癒す美しい短歌（五七五七七の31音）を一首だけ詠んでください。\n\n" +
+            "以下の JSON 形式で返答してください:\n" +
+            '{ "isValidInput": true, "tankaText": "五文字\\n七文字\\n五文字\\n七文字\\n七文字" }\n\n' +
+            "isValidInput の判定基準:\n" +
+            "- 意味のある日本語の悩み・相談であれば true\n" +
+            "- 意味不明な文字列、テスト入力、悩みと無関係な内容であれば false\n\n" +
+            "isValidInput が false の場合、tankaText は空文字にしてください。\n" +
+            "isValidInput が true の場合、各句の間には改行（\\n）を入れてください。",
         },
         {
           role: "user",
@@ -82,7 +115,24 @@ export const generateTanka = onCall(
       temperature: 0.8,
     });
 
-    const tankaText = completion.choices[0]?.message?.content?.trim();
+    const rawContent = completion.choices[0]?.message?.content?.trim();
+    if (!rawContent) {
+      throw new HttpsError("internal", "短歌の生成に失敗しました。もう一度お試しください。");
+    }
+
+    let parsed: { isValidInput: boolean; tankaText: string };
+    try {
+      parsed = JSON.parse(rawContent);
+    } catch {
+      // JSON パース失敗時はフォールバック（従来の文字列レスポンスとして扱う）
+      parsed = { isValidInput: true, tankaText: rawContent };
+    }
+
+    if (!parsed.isValidInput) {
+      throw new HttpsError("invalid-argument", "悩みの内容をもう少し具体的に書いてください。");
+    }
+
+    const tankaText = parsed.tankaText?.trim();
     if (!tankaText) {
       throw new HttpsError("internal", "短歌の生成に失敗しました。もう一度お試しください。");
     }

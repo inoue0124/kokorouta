@@ -130,8 +130,8 @@ struct ComposeView: View {
                     .padding(12)
                     .focused($isTextEditorFocused)
                     .onChange(of: viewModel.worryText) {
-                        if viewModel.worryText.count > 200 {
-                            viewModel.worryText = String(viewModel.worryText.prefix(200))
+                        if viewModel.worryText.count > 300 {
+                            viewModel.worryText = String(viewModel.worryText.prefix(300))
                         }
                     }
 
@@ -161,7 +161,7 @@ struct ComposeView: View {
 
                 Spacer()
 
-                Text("\(viewModel.characterCount)/200")
+                Text("\(viewModel.characterCount)/300")
                     .font(.appCaption())
                     .foregroundStyle(Color.appSubText)
             }
@@ -217,12 +217,40 @@ struct ComposeView: View {
     private func errorContent(error: AppError, viewModel: ComposeViewModel) -> some View {
         if case .rateLimited = error {
             rateLimitedContent(error: error)
+        } else if case .validation = error {
+            validationErrorContent(error: error)
         } else {
             ErrorView(error: error) {
                 Task {
                     await viewModel.retry()
                 }
             }
+        }
+    }
+
+    private func validationErrorContent(error: AppError) -> some View {
+        VStack(spacing: 20) {
+            Spacer()
+
+            Text(error.errorDescription ?? "")
+                .font(.appBody())
+                .foregroundStyle(Color.appText)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+
+            Button {
+                viewModel?.resetToInput()
+            } label: {
+                Text("戻って修正する")
+                    .font(.appBody())
+                    .foregroundStyle(Color.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Color.appText, in: RoundedRectangle(cornerRadius: 8))
+            }
+            .padding(.horizontal, 24)
+
+            Spacer()
         }
     }
 
