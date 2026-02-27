@@ -83,10 +83,12 @@ struct FeedView: View {
                             viewModel.reportTarget = tanka
                             showReportSheet = true
                         }
+                        .accessibilityLabel("この短歌を通報する")
                         Button("ブロックする") {
                             viewModel.blockTarget = tanka
                             showBlockAlert = true
                         }
+                        .accessibilityLabel("この投稿者をブロックする")
                     }
                     .onAppear {
                         if tanka.id == viewModel.tankaList.last?.id {
@@ -99,6 +101,7 @@ struct FeedView: View {
                     ProgressView()
                         .tint(Color.appSubText)
                         .padding()
+                        .accessibilityLabel("さらに読み込み中")
                 }
             }
             .padding(.horizontal, 20)

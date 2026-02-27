@@ -42,6 +42,8 @@ struct AccountDeleteView: View {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.appDivider, lineWidth: 1)
                     )
+                    .accessibilityLabel("削除確認入力欄")
+                    .accessibilityHint("確認のため「削除」と入力してください")
                 }
 
                 if let error = viewModel.error {
@@ -71,6 +73,8 @@ struct AccountDeleteView: View {
                     in: RoundedRectangle(cornerRadius: 8)
                 )
                 .disabled(!viewModel.canDelete || viewModel.isDeleting)
+                .accessibilityLabel(viewModel.isDeleting ? "削除中" : "アカウントを削除する")
+                .accessibilityHint(viewModel.canDelete ? "タップするとアカウントが完全に削除されます" : "確認欄に「削除」と入力すると有効になります")
 
                 Spacer()
             }

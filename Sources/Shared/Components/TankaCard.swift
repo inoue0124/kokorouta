@@ -48,6 +48,18 @@ struct TankaCard: View {
                 hasAnimatedOnce = true
             }
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(cardAccessibilityLabel)
+        .accessibilityHint(isFlipped ? "タップして悩みを表示" : "タップして短歌を表示")
+        .accessibilityAddTraits(.isButton)
+    }
+
+    private var cardAccessibilityLabel: String {
+        if isFlipped {
+            return "短歌: \(tanka.tankaText.replacingOccurrences(of: "\n", with: " "))"
+        } else {
+            return "悩み: \(tanka.worryText)、カテゴリ: \(tanka.category.displayName)"
+        }
     }
 
     // MARK: - Front Face

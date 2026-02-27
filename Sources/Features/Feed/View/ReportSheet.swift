@@ -36,6 +36,9 @@ struct ReportSheet: View {
                             .padding(.vertical, 8)
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel(reason.displayName)
+                        .accessibilityValue(selectedReason == reason ? "選択中" : "未選択")
+                        .accessibilityAddTraits(selectedReason == reason ? [.isButton, .isSelected] : .isButton)
                     }
                 }
 
@@ -53,6 +56,7 @@ struct ReportSheet: View {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.appDivider, lineWidth: 1)
                     )
+                    .accessibilityLabel("キャンセル")
 
                     Button {
                         guard let reason = selectedReason else { return }
@@ -83,6 +87,8 @@ struct ReportSheet: View {
                         in: RoundedRectangle(cornerRadius: 8)
                     )
                     .disabled(selectedReason == nil || isSubmitting)
+                    .accessibilityLabel(isSubmitting ? "送信中" : "通報を送信")
+                    .accessibilityHint(selectedReason == nil ? "通報理由を選択してください" : "")
                 }
             }
             .padding(24)
