@@ -49,6 +49,7 @@ struct AnimatedVerticalText: View {
     private func buildPhrases() -> [String] {
         text.components(separatedBy: "\n")
             .flatMap { $0.components(separatedBy: "\u{3000}") }
+            .flatMap { $0.components(separatedBy: " ") }
             .filter { !$0.isEmpty }
     }
 }
