@@ -8,9 +8,14 @@ final class TankaResultViewModel {
     private(set) var error: AppError?
 
     private let tankaRepository: any TankaRepositoryProtocol
+    private let dailyLimitService: any DailyLimitServiceProtocol
 
-    init(tankaRepository: any TankaRepositoryProtocol) {
+    init(
+        tankaRepository: any TankaRepositoryProtocol,
+        dailyLimitService: any DailyLimitServiceProtocol
+    ) {
         self.tankaRepository = tankaRepository
+        self.dailyLimitService = dailyLimitService
     }
 
     func generateTanka(category: WorryCategory, worryText: String) async {
@@ -23,6 +28,7 @@ final class TankaResultViewModel {
                 worryText: worryText
             )
             generatedTanka = tanka
+            dailyLimitService.recordCreation()
         } catch {
             self.error = AppError(error)
         }

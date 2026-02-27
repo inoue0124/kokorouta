@@ -2,10 +2,12 @@ import SwiftUI
 
 struct FeedView: View {
     @Environment(\.tankaRepository) private var repository
+    @Environment(\.dailyLimitService) private var dailyLimitService
     @Binding var path: NavigationPath
     @State private var viewModel: FeedViewModel?
     @State private var showReportSheet = false
     @State private var showBlockAlert = false
+    @State private var hasCreatedToday = false
 
     var body: some View {
         content
@@ -16,7 +18,11 @@ struct FeedView: View {
                 if viewModel == nil {
                     viewModel = FeedViewModel(tankaRepository: repository)
                 }
+                hasCreatedToday = dailyLimitService.hasCreatedToday()
                 await viewModel?.loadFeed()
+            }
+            .onAppear {
+                hasCreatedToday = dailyLimitService.hasCreatedToday()
             }
             .refreshable {
                 await viewModel?.loadFeed()
@@ -99,8 +105,20 @@ struct FeedView: View {
             .padding(.vertical, 16)
         }
         .overlay(alignment: .bottomTrailing) {
-            FloatingActionButton {
-                path.append(FeedRoute.compose)
+            VStack(alignment: .trailing, spacing: 8) {
+                if hasCreatedToday {
+                    Text("明日また詠めます")
+                        .font(.appCaption())
+                        .foregroundStyle(Color.appSubText)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.appCardBackground, in: Capsule())
+                }
+                FloatingActionButton {
+                    path.append(FeedRoute.compose)
+                }
+                .opacity(hasCreatedToday ? 0.4 : 1)
+                .disabled(hasCreatedToday)
             }
             .padding(24)
         }

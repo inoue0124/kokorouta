@@ -6,6 +6,7 @@ struct TankaResultView: View {
     @Binding var path: NavigationPath
 
     @Environment(\.tankaRepository) private var repository
+    @Environment(\.dailyLimitService) private var dailyLimitService
     @State private var viewModel: TankaResultViewModel?
 
     var body: some View {
@@ -16,7 +17,10 @@ struct TankaResultView: View {
             .navigationBarBackButtonHidden(true)
             .task {
                 if viewModel == nil {
-                    viewModel = TankaResultViewModel(tankaRepository: repository)
+                    viewModel = TankaResultViewModel(
+                        tankaRepository: repository,
+                        dailyLimitService: dailyLimitService
+                    )
                 }
                 await viewModel?.generateTanka(category: category, worryText: worryText)
             }
