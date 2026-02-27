@@ -55,6 +55,12 @@ jobs:
 
       - name: Build
         run: fastlane build
+        env:
+          FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 60
+          FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 5
 
       - name: Test
         run: fastlane test
+        env:
+          FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 60
+          FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 5
