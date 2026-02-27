@@ -1,3 +1,4 @@
+@preconcurrency import FirebaseAuth
 import Foundation
 
 @Observable
@@ -24,9 +25,12 @@ final class AccountDeleteViewModel {
         defer { isDeleting = false }
         do {
             try await tankaRepository.deleteAccount()
-            isDeleted = true
         } catch {
             self.error = AppError(error)
+            return
         }
+        try? Auth.auth().signOut()
+        isDeleted = true
+        NotificationCenter.default.post(name: .accountDidDelete, object: nil)
     }
 }
