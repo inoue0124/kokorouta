@@ -98,7 +98,7 @@ struct TankaCard: View {
     private var backFace: some View {
         VStack {
             Spacer()
-            if useAnimatedBackFace && !hasAnimatedOnce {
+            if useAnimatedBackFace, !hasAnimatedOnce {
                 AnimatedVerticalText(text: tanka.tankaText)
             } else {
                 VerticalText(text: tanka.tankaText)
