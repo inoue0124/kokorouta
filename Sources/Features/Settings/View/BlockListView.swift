@@ -6,6 +6,7 @@ struct BlockListView: View {
 
     var body: some View {
         content
+            .background(Color.appBackground)
             .navigationTitle("ブロックリスト")
             .navigationBarTitleDisplayMode(.inline)
             .task {
@@ -53,5 +54,7 @@ struct BlockListView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(Color.appBackground)
     }
 }
