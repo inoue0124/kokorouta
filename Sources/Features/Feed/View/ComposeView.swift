@@ -38,13 +38,15 @@ struct ComposeView: View {
                 .font(.appCaption())
                 .foregroundStyle(Color.appSubText)
 
-            HStack(spacing: 8) {
-                ForEach(WorryCategory.allCases, id: \.self) { category in
-                    CategoryChip(
-                        category: category,
-                        isSelected: viewModel.selectedCategory == category
-                    ) {
-                        viewModel.selectCategory(category)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(WorryCategory.allCases, id: \.self) { category in
+                        CategoryChip(
+                            category: category,
+                            isSelected: viewModel.selectedCategory == category
+                        ) {
+                            viewModel.selectCategory(category)
+                        }
                     }
                 }
             }
