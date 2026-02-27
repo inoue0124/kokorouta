@@ -35,6 +35,12 @@ struct MainApp: SwiftUI.App {
             .task {
                 await signInAnonymously()
             }
+            .onReceive(NotificationCenter.default.publisher(for: .accountDidDelete)) { _ in
+                isAuthReady = false
+                Task {
+                    await signInAnonymously()
+                }
+            }
         }
     }
 
@@ -52,4 +58,8 @@ struct MainApp: SwiftUI.App {
             await signInAnonymously()
         }
     }
+}
+
+extension Notification.Name {
+    static let accountDidDelete = Notification.Name("accountDidDelete")
 }
