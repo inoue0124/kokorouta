@@ -9,8 +9,13 @@ options:
 
 settings:
   base:
-    SWIFT_VERSION: "6.0"
+    SWIFT_VERSION: "6.2"
     SWIFT_STRICT_CONCURRENCY: complete
+
+packages:
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: "11.0.0"
 
 targets:
   App:
@@ -19,12 +24,20 @@ targets:
     sources:
       - path: Sources/App
       - path: Sources/Features
+      - path: Sources/Shared
     settings:
       base:
         INFOPLIST_FILE: Sources/App/Info.plist
-        PRODUCT_BUNDLE_IDENTIFIER: com.example.app
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.kokorouta
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: "1"
+    dependencies:
+      - package: Firebase
+        product: FirebaseAuth
+      - package: Firebase
+        product: FirebaseFirestore
+      - package: Firebase
+        product: FirebaseFunctions
 
   AppTests:
     type: bundle.unit-test
