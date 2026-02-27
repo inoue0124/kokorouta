@@ -10,11 +10,7 @@ struct FeedNavigationView: View {
                 .navigationDestination(for: FeedRoute.self) { route in
                     switch route {
                     case .compose:
-                        ComposeView(path: $path)
-                    case let .tankaResult(category, worryText):
-                        TankaResultView(
-                            category: category,
-                            worryText: worryText,
+                        ComposeView(
                             path: $path,
                             hasReachedDailyLimit: $hasReachedDailyLimit
                         )
