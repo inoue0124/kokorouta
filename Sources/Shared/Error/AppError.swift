@@ -24,7 +24,14 @@ enum AppError: Error, Sendable, LocalizedError {
 
     init(_ error: Error) {
         if let networkError = error as? NetworkError {
-            self = .network(networkError)
+            switch networkError {
+            case .rateLimited:
+                self = .rateLimited(nextAvailableAt: Calendar.current.startOfDay(
+                    for: Date()
+                ).addingTimeInterval(24 * 60 * 60))
+            default:
+                self = .network(networkError)
+            }
         } else if let appError = error as? Self {
             self = appError
         } else {

@@ -2,10 +2,11 @@ import SwiftUI
 
 struct FeedNavigationView: View {
     @State private var path = NavigationPath()
+    @State private var hasReachedDailyLimit = false
 
     var body: some View {
         NavigationStack(path: $path) {
-            FeedView(path: $path)
+            FeedView(path: $path, hasReachedDailyLimit: hasReachedDailyLimit)
                 .navigationDestination(for: FeedRoute.self) { route in
                     switch route {
                     case .compose:
@@ -14,7 +15,8 @@ struct FeedNavigationView: View {
                         TankaResultView(
                             category: category,
                             worryText: worryText,
-                            path: $path
+                            path: $path,
+                            hasReachedDailyLimit: $hasReachedDailyLimit
                         )
                     }
                 }
