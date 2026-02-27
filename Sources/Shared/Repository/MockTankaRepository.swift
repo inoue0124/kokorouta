@@ -7,7 +7,7 @@
         private var blockedUserIDs: Set<String> = []
 
         init() {
-            tankaList = PreviewTankaRepository.sampleTanka
+            tankaList = Self.sampleTanka
         }
 
         func generateTanka(category: WorryCategory, worryText: String) async throws -> Tanka {
