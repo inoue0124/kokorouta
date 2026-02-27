@@ -57,7 +57,12 @@ struct FeedView: View {
                     Task { await viewModel.loadFeed() }
                 }
             } else if viewModel.tankaList.isEmpty {
-                EmptyStateView(message: "まだ短歌がありません")
+                EmptyStateView(
+                    message: "まだ短歌がありません",
+                    actionLabel: "最初の短歌を詠む"
+                ) {
+                    path.append(FeedRoute.compose)
+                }
             } else {
                 feedList(viewModel: viewModel)
             }
