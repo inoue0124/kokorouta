@@ -11,9 +11,9 @@ final class APIClient: Sendable {
     init(functions: Functions = Functions.functions(region: "asia-northeast1")) {
         self.functions = functions
 
-        if ProcessInfo.processInfo.environment["USE_EMULATOR"] == "1" {
+        #if DEBUG
             self.functions.useEmulator(withHost: "localhost", port: 5001)
-        }
+        #endif
 
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
