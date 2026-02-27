@@ -35,7 +35,7 @@ else
     SWIFTLINT_CMD="swiftlint"
 fi
 
-if $SWIFTLINT_CMD lint --quiet 2>/dev/null; then
+if $SWIFTLINT_CMD lint --strict --quiet 2>/dev/null; then
     success "SwiftLint 完了（違反なし）"
 else
     warn "SwiftLint で違反が検出されました"
