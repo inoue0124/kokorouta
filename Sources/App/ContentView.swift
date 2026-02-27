@@ -5,15 +5,11 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            NavigationStack {
-                Text("フィード")
-                    .font(.appTitle())
-                    .foregroundStyle(Color.appText)
-            }
-            .tag(AppTab.feed)
-            .tabItem {
-                Label(AppTab.feed.rawValue, systemImage: AppTab.feed.systemImage)
-            }
+            FeedNavigationView()
+                .tag(AppTab.feed)
+                .tabItem {
+                    Label(AppTab.feed.rawValue, systemImage: AppTab.feed.systemImage)
+                }
 
             NavigationStack {
                 Text("わたしの歌")
