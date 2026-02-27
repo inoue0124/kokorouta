@@ -202,7 +202,7 @@ struct ComposeViewModelTests {
         let viewModel = ComposeViewModel()
 
         #expect(viewModel.selectedCategory == nil)
-        #expect(viewModel.worryText == "")
+        #expect(viewModel.worryText.isEmpty)
         #expect(viewModel.isShowingConfirmation == false)
         #expect(viewModel.phase.isInput)
         #expect(viewModel.generatedTanka == nil)
