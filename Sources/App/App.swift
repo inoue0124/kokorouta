@@ -10,7 +10,7 @@ struct MainApp: SwiftUI.App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .background(Color.appBackground)
+                .background(Color.appBackground.ignoresSafeArea())
         }
     }
 }
