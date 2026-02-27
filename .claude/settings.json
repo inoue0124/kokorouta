@@ -1,0 +1,38 @@
+{
+  "enabledPlugins": {
+    "code-review-assist@ios-claude-plugins": true,
+    "feature-implementation@ios-claude-plugins": true,
+    "feature-module-gen@ios-claude-plugins": true,
+    "github-workflow@ios-claude-plugins": true,
+    "ios-architecture@ios-claude-plugins": true,
+    "ios-distribution@ios-claude-plugins": true,
+    "ios-onboarding@ios-claude-plugins": true,
+    "spec-driven-dev@ios-claude-plugins": true,
+    "swift-code-quality@ios-claude-plugins": true,
+    "swift-testing@ios-claude-plugins": true,
+    "team-conventions@ios-claude-plugins": true
+  },
+  "mcpServers": {
+    "XcodeBuildMCP": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "xcodebuildmcp@latest",
+        "mcp"
+      ]
+    },
+    "xcodeproj": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--pull=always",
+        "--rm",
+        "-i",
+        "-v",
+        "$PWD:/workspace",
+        "ghcr.io/giginet/xcodeproj-mcp-server:latest",
+        "/workspace"
+      ]
+    }
+  }
+}
