@@ -14,9 +14,14 @@ struct VerticalText: View {
                 let column = columns[columnIndex]
                 VStack(spacing: fontSize * 0.2) {
                     ForEach(column.indices, id: \.self) { charIndex in
-                        Text(String(column[charIndex]))
+                        let char = column[charIndex]
+                        Text(String(char))
                             .font(font ?? .tankaFont(size: fontSize))
                             .foregroundStyle(Color.appText)
+                            .offset(
+                                x: char.isVerticalPunctuation ? fontSize * 0.3 : 0,
+                                y: char.isVerticalPunctuation ? -fontSize * 0.3 : 0
+                            )
                     }
                 }
             }
@@ -57,6 +62,12 @@ struct VerticalText: View {
         }
 
         return columns.reversed()
+    }
+}
+
+private extension Character {
+    var isVerticalPunctuation: Bool {
+        self == "、" || self == "。" || self == "，" || self == "．"
     }
 }
 
