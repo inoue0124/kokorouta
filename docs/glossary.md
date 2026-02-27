@@ -17,7 +17,7 @@
 | マイ短歌 | My Tanka | ユーザー自身が過去に生成した短歌の一覧 | `MyTankaView`, `MyTankaViewModel` |
 | 通報 | Report | 不適切なコンテンツを運営に報告する機能 | `Report`, `ReportSheet`, `ReportReason` |
 | ブロック | Block | 特定ユーザーの短歌をフィードから非表示にする機能 | `BlockedUser`, `BlockListView` |
-| 1日1回制限 | Daily Limit | 1日に1つだけ短歌を生成できる制限 | `lastTankaDate`, `canCompose` |
+| 日次制限 | Daily Limit | 1日に生成可能な短歌数の制限（`MAX_DAILY_TANKA` で管理） | `lastTankaCreatedAt`, `dailyTankaCount`, `canCompose` |
 
 ## 2. 技術用語
 

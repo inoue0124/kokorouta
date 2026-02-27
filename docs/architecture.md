@@ -513,7 +513,8 @@ firestore/
 ├── users/                          # ユーザーコレクション
 │   └── {userID}/
 │       ├── createdAt: timestamp
-│       ├── lastTankaDate: string   # "YYYY-MM-DD" 形式（1日1回制限用）
+│       ├── lastTankaCreatedAt: timestamp  # 最後の短歌生成日時（日次制限用）
+│       ├── dailyTankaCount: number        # 当日の短歌生成回数
 │       └── blockedUsers/           # サブコレクション
 │           └── {blockedUserID}/
 │               └── createdAt: timestamp

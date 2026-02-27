@@ -6,6 +6,7 @@ import OpenAI from "openai";
 const openaiApiKey = defineSecret("OPENAI_API_KEY");
 
 const VALID_CATEGORIES = ["relationship", "love", "work", "health", "other"];
+const MAX_DAILY_TANKA = 1;
 
 function validateWorryText(text: string): void {
   const trimmed = text.trim();
@@ -61,13 +62,32 @@ export const generateTanka = onCall(
     const db = admin.firestore();
     const userRef = db.collection("users").doc(uid);
 
-    // Check 1-per-day limit
-    const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+    // Check daily limit
+    const now = new Date();
     const userDoc = await userRef.get();
+    let isToday = false;
+    let dailyCount = 0;
 
     if (userDoc.exists) {
-      const lastTankaDate = userDoc.data()?.lastTankaDate;
-      if (lastTankaDate === today) {
+      const userData = userDoc.data();
+      const lastCreatedAt = userData?.lastTankaCreatedAt;
+
+      if (lastCreatedAt && typeof lastCreatedAt.toDate === "function") {
+        // New format: Firestore Timestamp
+        const lastDate = lastCreatedAt.toDate();
+        isToday =
+          lastDate.getFullYear() === now.getFullYear() &&
+          lastDate.getMonth() === now.getMonth() &&
+          lastDate.getDate() === now.getDate();
+      } else if (typeof userData?.lastTankaDate === "string") {
+        // Legacy format: "YYYY-MM-DD" string (backward compatibility)
+        const today = now.toISOString().split("T")[0];
+        isToday = userData.lastTankaDate === today;
+      }
+
+      dailyCount = isToday ? (userData?.dailyTankaCount ?? 1) : 0;
+
+      if (isToday && dailyCount >= MAX_DAILY_TANKA) {
         throw new HttpsError(
           "resource-exhausted",
           "短歌の作成は1日1回までです。明日また来てください。"
@@ -138,7 +158,7 @@ export const generateTanka = onCall(
     }
 
     // Save to Firestore
-    const now = admin.firestore.Timestamp.now();
+    const firestoreNow = admin.firestore.Timestamp.now();
     const tankaRef = db.collection("tanka").doc();
 
     const tankaData = {
@@ -149,16 +169,17 @@ export const generateTanka = onCall(
       likeCount: 0,
       reportCount: 0,
       isHidden: false,
-      createdAt: now,
+      createdAt: firestoreNow,
     };
 
     await tankaRef.set(tankaData);
 
-    // Update user's lastTankaDate (create user doc if it doesn't exist)
+    // Update user's daily tanka tracking
     await userRef.set(
       {
-        lastTankaDate: today,
-        createdAt: userDoc.exists ? userDoc.data()?.createdAt : now,
+        lastTankaCreatedAt: firestoreNow,
+        dailyTankaCount: isToday ? dailyCount + 1 : 1,
+        createdAt: userDoc.exists ? userDoc.data()?.createdAt : firestoreNow,
       },
       { merge: true }
     );
@@ -172,7 +193,7 @@ export const generateTanka = onCall(
         tankaText,
         likeCount: 0,
         isLikedByMe: false,
-        createdAt: now.toDate().toISOString(),
+        createdAt: firestoreNow.toDate().toISOString(),
       },
     };
   }
