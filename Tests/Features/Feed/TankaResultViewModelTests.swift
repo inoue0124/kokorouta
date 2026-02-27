@@ -79,8 +79,10 @@ struct ComposeSubmitTests {
         await viewModel.submitTanka()
 
         #expect(viewModel.generatedTanka == nil)
-        if case .error(let error) = viewModel.phase,
-           case let .validation(message) = error {
+        if
+            case let .error(error) = viewModel.phase,
+            case let .validation(message) = error
+        {
             #expect(message == "もう少し詳しく悩みを書いてください。")
         } else {
             Issue.record("Expected .validation error but got \(viewModel.phase)")
