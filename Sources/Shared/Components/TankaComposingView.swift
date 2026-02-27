@@ -82,6 +82,6 @@ struct TankaComposingView: View {
 }
 
 #Preview("Reduced Motion") {
+    // 実機のアクセシビリティ設定で確認
     TankaComposingView()
-        .environment(\.accessibilityReduceMotion, true)
 }
