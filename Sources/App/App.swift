@@ -5,7 +5,7 @@ import SwiftUI
 struct MainApp: SwiftUI.App {
     init() {
         #if !DEBUG
-        FirebaseApp.configure()
+            FirebaseApp.configure()
         #endif
     }
 
