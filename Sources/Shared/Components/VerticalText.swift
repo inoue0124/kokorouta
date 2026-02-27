@@ -3,32 +3,71 @@ import SwiftUI
 struct VerticalText: View {
     let text: String
     var fontSize: CGFloat = 22
+    var font: Font?
+    var maxCharsPerColumn: Int = 0
 
     var body: some View {
-        let characters = Array(text)
+        let columns = buildColumns()
 
         HStack(alignment: .top, spacing: fontSize * 0.8) {
-            ForEach(lines(from: characters).indices, id: \.self) { lineIndex in
-                let line = lines(from: characters)[lineIndex]
+            ForEach(columns.indices, id: \.self) { columnIndex in
+                let column = columns[columnIndex]
                 VStack(spacing: fontSize * 0.2) {
-                    ForEach(line.indices, id: \.self) { charIndex in
-                        Text(String(line[charIndex]))
-                            .font(.tankaFont(size: fontSize))
+                    ForEach(column.indices, id: \.self) { charIndex in
+                        let char = column[charIndex]
+                        Text(String(char))
+                            .font(font ?? .tankaFont(size: fontSize))
                             .foregroundStyle(Color.appText)
+                            .offset(
+                                x: char.isVerticalPunctuation ? fontSize * 0.3 : 0,
+                                y: char.isVerticalPunctuation ? -fontSize * 0.3 : 0
+                            )
                     }
                 }
             }
         }
     }
 
+    private func buildColumns() -> [[Character]] {
+        if maxCharsPerColumn > 0 {
+            return wrapColumns(from: text, maxChars: maxCharsPerColumn)
+        }
+        return splitByNewlines(from: text)
+    }
+
     /// 短歌テキストを行に分割する（右から左に表示するため reversed）
-    private func lines(from characters: [Character]) -> [[Character]] {
-        let text = String(characters)
+    private func splitByNewlines(from text: String) -> [[Character]] {
         let segments = text.components(separatedBy: "\n")
             .flatMap { $0.components(separatedBy: "　") }
             .filter { !$0.isEmpty }
 
         return segments.reversed().map { Array($0) }
+    }
+
+    /// 長文テキストを一定文字数で折り返して縦書き列にする（右から左）
+    private func wrapColumns(from text: String, maxChars: Int) -> [[Character]] {
+        let cleaned = text.replacingOccurrences(of: "\n", with: "")
+        var columns: [[Character]] = []
+        var current: [Character] = []
+
+        for char in cleaned {
+            current.append(char)
+            if current.count >= maxChars {
+                columns.append(current)
+                current = []
+            }
+        }
+        if !current.isEmpty {
+            columns.append(current)
+        }
+
+        return columns.reversed()
+    }
+}
+
+private extension Character {
+    var isVerticalPunctuation: Bool {
+        self == "、" || self == "。" || self == "，" || self == "．"
     }
 }
 

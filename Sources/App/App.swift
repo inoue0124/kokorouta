@@ -4,7 +4,9 @@ import SwiftUI
 @main
 struct MainApp: SwiftUI.App {
     init() {
-        FirebaseApp.configure()
+        #if !DEBUG
+            FirebaseApp.configure()
+        #endif
     }
 
     var body: some Scene {

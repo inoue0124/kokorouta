@@ -23,6 +23,8 @@ struct SettingsView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(Color.appBackground)
         .navigationTitle("設定")
         .navigationBarTitleDisplayMode(.inline)
     }

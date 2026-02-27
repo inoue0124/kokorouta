@@ -10,6 +10,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  SWIFTLINT_VERSION: "0.63.2"
+  SWIFTFORMAT_VERSION: "0.59.1"
+
 jobs:
   lint:
     name: Lint
@@ -17,17 +21,25 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Install Mint
-        run: brew install mint
+      - name: Install SwiftLint
+        run: |
+          curl -sL "https://github.com/realm/SwiftLint/releases/download/${SWIFTLINT_VERSION}/portable_swiftlint.zip" -o swiftlint.zip
+          unzip -o swiftlint.zip
+          sudo cp swiftlint /usr/local/bin/swiftlint
+          swiftlint version
 
-      - name: Bootstrap tools
-        run: mint bootstrap
+      - name: Install SwiftFormat
+        run: |
+          curl -sL "https://github.com/nicklockwood/SwiftFormat/releases/download/${SWIFTFORMAT_VERSION}/swiftformat.zip" -o swiftformat.zip
+          unzip -o swiftformat.zip
+          sudo cp swiftformat /usr/local/bin/swiftformat
+          swiftformat --version
 
       - name: Run SwiftFormat
-        run: mint run swiftformat --lint .
+        run: swiftformat --lint .
 
       - name: Run SwiftLint
-        run: mint run swiftlint lint --strict --quiet
+        run: swiftlint lint --strict --quiet
 
   build-and-test:
     name: Build & Test
@@ -35,17 +47,20 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Install tools
-        run: brew install mint xcodegen
-
-      - name: Bootstrap tools
-        run: mint bootstrap
+      - name: Install xcodegen
+        run: brew install xcodegen
 
       - name: Generate Xcode project
         run: xcodegen generate
 
       - name: Build
         run: fastlane build
+        env:
+          FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 60
+          FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 5
 
       - name: Test
         run: fastlane test
+        env:
+          FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 60
+          FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 5
