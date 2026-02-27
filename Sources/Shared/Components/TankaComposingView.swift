@@ -52,7 +52,7 @@ struct TankaComposingView: View {
 
     private var rippleEffect: some View {
         ZStack {
-            ForEach(0..<rippleCount, id: \.self) { index in
+            ForEach(0 ..< rippleCount, id: \.self) { index in
                 let delay = Double(index) / Double(rippleCount)
                 let phase = (ripplePhase + delay).truncatingRemainder(dividingBy: 1.0)
 

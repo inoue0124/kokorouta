@@ -65,8 +65,10 @@ final class ComposeViewModel {
     }
 
     var isRateLimited: Bool {
-        if case .error(let error) = phase,
-           case .rateLimited = error {
+        if
+            case let .error(error) = phase,
+            case .rateLimited = error
+        {
             return true
         }
         return false
