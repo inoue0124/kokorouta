@@ -3,6 +3,7 @@ import SwiftUI
 struct FeedView: View {
     @Environment(\.tankaRepository) private var repository
     @Binding var path: NavigationPath
+    let hasReachedDailyLimit: Bool
     @State private var viewModel: FeedViewModel?
     @State private var showReportSheet = false
     @State private var showBlockAlert = false
@@ -99,8 +100,17 @@ struct FeedView: View {
             .padding(.vertical, 16)
         }
         .overlay(alignment: .bottomTrailing) {
-            FloatingActionButton {
-                path.append(FeedRoute.compose)
+            VStack(spacing: 8) {
+                if hasReachedDailyLimit {
+                    Text("明日また詠めます")
+                        .font(.appCaption())
+                        .foregroundStyle(Color.appSubText)
+                }
+                FloatingActionButton {
+                    path.append(FeedRoute.compose)
+                }
+                .disabled(hasReachedDailyLimit)
+                .opacity(hasReachedDailyLimit ? 0.4 : 1.0)
             }
             .padding(24)
         }
