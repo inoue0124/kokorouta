@@ -51,3 +51,26 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         BUNDLE_LOADER: "$(TEST_HOST)"
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/App"
+
+schemes:
+  App:
+    build:
+      targets:
+        App: all
+        AppTests: [test]
+    run:
+      config: Debug
+      environmentVariables:
+        - variable: USE_EMULATOR
+          value: "1"
+          isEnabled: false
+    test:
+      config: Debug
+      targets:
+        - AppTests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
