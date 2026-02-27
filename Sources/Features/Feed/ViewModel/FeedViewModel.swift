@@ -22,6 +22,7 @@ final class FeedViewModel {
     func loadFeed() async {
         isLoading = true
         error = nil
+        paginationError = nil
         defer { isLoading = false }
         do {
             let response = try await tankaRepository.fetchFeed(limit: 20, afterID: nil)
