@@ -80,6 +80,8 @@ struct ComposeView: View {
                     .font(.appTitle(size: 20))
                     .foregroundStyle(Color.appText)
 
+                dailyLimitNotice
+
                 categorySection(viewModel: viewModel)
 
                 textInputSection(viewModel: viewModel)
@@ -169,11 +171,10 @@ struct ComposeView: View {
     }
 
     private func submitButton(viewModel: ComposeViewModel) -> some View {
-        Button {
+        @Bindable var viewModel = viewModel
+        return Button {
             isTextEditorFocused = false
-            Task {
-                await viewModel.submitTanka()
-            }
+            viewModel.isShowingConfirmation = true
         } label: {
             Text("短歌を詠む")
                 .font(.appBody())
@@ -186,6 +187,16 @@ struct ComposeView: View {
                 )
         }
         .disabled(!viewModel.isValid)
+        .alert("この内容で生成しますか？", isPresented: $viewModel.isShowingConfirmation) {
+            Button("生成する") {
+                Task {
+                    await viewModel.submitTanka()
+                }
+            }
+            Button("キャンセル", role: .cancel) {}
+        } message: {
+            Text("本日はやり直しできません")
+        }
     }
 
     // MARK: - Result Phase
@@ -274,6 +285,23 @@ struct ComposeView: View {
         }
         .padding(.horizontal, 24)
         .padding(.bottom, 24)
+    }
+
+    // MARK: - Daily Limit Notice
+
+    private var dailyLimitNotice: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "info.circle")
+                .foregroundStyle(Color.appSubText)
+
+            Text("1日1回だけ生成できます。じっくり悩みを言葉にしてみてください。")
+                .font(.appCaption())
+                .foregroundStyle(Color.appSubText)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.appDivider.opacity(0.3))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
     // MARK: - Shared Components

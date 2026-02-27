@@ -32,6 +32,7 @@ final class ComposeViewModel {
 
     var selectedCategory: WorryCategory?
     var worryText: String = ""
+    var isShowingConfirmation = false
     private(set) var phase: ComposePhase = .input
     private(set) var generatedTanka: Tanka?
 
