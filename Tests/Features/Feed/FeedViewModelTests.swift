@@ -187,7 +187,7 @@ struct FeedViewModelPaginationTests {
     // MARK: - loadMore error
 
     @Test
-    func loadMore_failure_setsError() async {
+    func loadMore_failure_setsPaginationError() async {
         let mock = MockTankaRepository()
         mock.stubbedFeedResponse = FeedResponse(
             tankaList: [Tanka.mock()],
@@ -200,7 +200,7 @@ struct FeedViewModelPaginationTests {
         mock.stubbedError = NetworkError.serverError(statusCode: 500)
         await viewModel.loadMore()
 
-        #expect(viewModel.error != nil)
+        #expect(viewModel.paginationError != nil)
         #expect(viewModel.isLoadingMore == false)
         #expect(viewModel.tankaList.count == 1)
     }
