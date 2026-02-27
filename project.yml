@@ -11,6 +11,12 @@ settings:
   base:
     SWIFT_VERSION: "6.2"
     SWIFT_STRICT_CONCURRENCY: complete
+    # コード署名設定
+    # DEVELOPMENT_TEAM は環境変数から取得する。
+    # ローカルビルド: export DEVELOPMENT_TEAM="YOUR_TEAM_ID"
+    # CI: シークレットとして設定する
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
 
 packages:
   Firebase:

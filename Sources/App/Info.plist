@@ -23,5 +23,7 @@
     </dict>
     <key>UILaunchScreen</key>
     <dict/>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>短歌の画像を保存するために写真ライブラリへのアクセスが必要です</string>
 </dict>
 </plist>
