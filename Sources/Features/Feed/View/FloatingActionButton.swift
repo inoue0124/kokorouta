@@ -12,6 +12,8 @@ struct FloatingActionButton: View {
                 .background(Color.appText, in: Circle())
                 .shadow(color: .black.opacity(0.08), radius: 8, y: 4)
         }
+        .accessibilityLabel("短歌を作成")
+        .accessibilityHint("悩みから短歌を生成します")
     }
 }
 

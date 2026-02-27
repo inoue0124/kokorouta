@@ -50,30 +50,44 @@ struct TankaCard: View {
         }
     }
 
+    private var frontAccessibilityLabel: String {
+        "悩み: \(tanka.worryText)、カテゴリ: \(tanka.category.displayName)、\(tanka.createdAt.shortDisplayString)"
+    }
+
+    private var backAccessibilityLabel: String {
+        "短歌: \(tanka.tankaText.replacingOccurrences(of: "\n", with: " "))、\(tanka.createdAt.shortDisplayString)"
+    }
+
     // MARK: - Front Face
 
     private var frontFace: some View {
         VStack(spacing: 12) {
-            HStack {
-                Text(tanka.category.displayName)
-                    .font(.appCaption())
-                    .foregroundStyle(Color.appSubText)
+            VStack(spacing: 12) {
+                HStack {
+                    Text(tanka.category.displayName)
+                        .font(.appCaption())
+                        .foregroundStyle(Color.appSubText)
+                    Spacer()
+                    Text(tanka.createdAt.shortDisplayString)
+                        .font(.appCaption())
+                        .foregroundStyle(Color.appSubText)
+                }
+
                 Spacer()
-                Text(tanka.createdAt.shortDisplayString)
-                    .font(.appCaption())
-                    .foregroundStyle(Color.appSubText)
+
+                VerticalText(
+                    text: tanka.worryText,
+                    fontSize: 16,
+                    font: .appBody(),
+                    maxCharsPerColumn: 12
+                )
+
+                Spacer()
             }
-
-            Spacer()
-
-            VerticalText(
-                text: tanka.worryText,
-                fontSize: 16,
-                font: .appBody(),
-                maxCharsPerColumn: 12
-            )
-
-            Spacer()
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(frontAccessibilityLabel)
+            .accessibilityHint("タップして裏返す")
+            .accessibilityAddTraits(.isButton)
 
             HStack {
                 Spacer()
@@ -97,13 +111,20 @@ struct TankaCard: View {
 
     private var backFace: some View {
         VStack {
-            Spacer()
-            if useAnimatedBackFace, !hasAnimatedOnce {
-                AnimatedVerticalText(text: tanka.tankaText)
-            } else {
-                VerticalText(text: tanka.tankaText)
+            VStack {
+                Spacer()
+                if useAnimatedBackFace, !hasAnimatedOnce {
+                    AnimatedVerticalText(text: tanka.tankaText)
+                } else {
+                    VerticalText(text: tanka.tankaText)
+                }
+                Spacer()
             }
-            Spacer()
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(backAccessibilityLabel)
+            .accessibilityHint("タップして裏返す")
+            .accessibilityAddTraits(.isButton)
+
             HStack {
                 Spacer()
                 ShareButton(tanka: tanka)
