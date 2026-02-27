@@ -1,16 +1,24 @@
 import FirebaseAuth
 import FirebaseCore
+import FirebaseFirestore
 import SwiftUI
 
 @main
 struct MainApp: SwiftUI.App {
     @State private var isAuthReady = false
 
+    static let isEmulator = ProcessInfo.processInfo.environment["USE_EMULATOR"] == "1"
+
     init() {
         FirebaseApp.configure()
 
-        if ProcessInfo.processInfo.environment["USE_EMULATOR"] == "1" {
-            Auth.auth().useEmulator(withHost: "localhost", port: 9099)
+        if Self.isEmulator {
+            Auth.auth().useEmulator(withHost: "127.0.0.1", port: 9099)
+            let settings = Firestore.firestore().settings
+            settings.host = "127.0.0.1:8080"
+            settings.isSSLEnabled = false
+            settings.cacheSettings = MemoryCacheSettings()
+            Firestore.firestore().settings = settings
         }
     }
 
@@ -40,7 +48,6 @@ struct MainApp: SwiftUI.App {
             _ = try await Auth.auth().signInAnonymously()
             isAuthReady = true
         } catch {
-            // Retry after delay — anonymous auth requires no user interaction
             try? await Task.sleep(for: .seconds(2))
             await signInAnonymously()
         }
