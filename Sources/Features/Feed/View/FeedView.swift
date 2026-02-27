@@ -100,6 +100,12 @@ struct FeedView: View {
                         .tint(Color.appSubText)
                         .padding()
                 }
+
+                if let paginationError = viewModel.paginationError {
+                    PaginationErrorView(error: paginationError) {
+                        Task { await viewModel.loadMore() }
+                    }
+                }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
