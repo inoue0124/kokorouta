@@ -81,6 +81,10 @@ struct TankaCard: View {
             Spacer()
             VerticalText(text: tanka.tankaText)
             Spacer()
+            HStack {
+                Spacer()
+                ShareButton(tanka: tanka)
+            }
         }
         .frame(maxWidth: .infinity, minHeight: 200)
         .padding(24)

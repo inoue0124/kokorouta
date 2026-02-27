@@ -55,6 +55,8 @@ struct TankaResultView: View {
                 .font(.appCaption())
                 .foregroundStyle(Color.appSubText)
 
+            ShareButton(tanka: tanka)
+
             Spacer()
 
             Button {
