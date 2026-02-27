@@ -75,24 +75,7 @@ struct FeedView: View {
         ScrollView {
             LazyVStack(spacing: 20) {
                 ForEach(viewModel.tankaList) { tanka in
-                    TankaCard(tanka: tanka) {
-                        Task { await viewModel.toggleLike(for: tanka) }
-                    }
-                    .contextMenu {
-                        Button("通報する") {
-                            viewModel.reportTarget = tanka
-                            showReportSheet = true
-                        }
-                        Button("ブロックする") {
-                            viewModel.blockTarget = tanka
-                            showBlockAlert = true
-                        }
-                    }
-                    .onAppear {
-                        if tanka.id == viewModel.tankaList.last?.id {
-                            Task { await viewModel.loadMore() }
-                        }
-                    }
+                    tankaRow(tanka: tanka, viewModel: viewModel)
                 }
 
                 if viewModel.isLoadingMore {
@@ -111,19 +94,44 @@ struct FeedView: View {
             .padding(.vertical, 16)
         }
         .overlay(alignment: .bottomTrailing) {
-            VStack(spacing: 8) {
-                if hasReachedDailyLimit {
-                    Text("明日また詠めます")
-                        .font(.appCaption())
-                        .foregroundStyle(Color.appSubText)
-                }
-                FloatingActionButton {
-                    path.append(FeedRoute.compose)
-                }
-                .disabled(hasReachedDailyLimit)
-                .opacity(hasReachedDailyLimit ? 0.4 : 1.0)
-            }
-            .padding(24)
+            composeButton
         }
+    }
+
+    private func tankaRow(tanka: Tanka, viewModel: FeedViewModel) -> some View {
+        TankaCard(tanka: tanka) {
+            Task { await viewModel.toggleLike(for: tanka) }
+        }
+        .contextMenu {
+            Button("通報する") {
+                viewModel.reportTarget = tanka
+                showReportSheet = true
+            }
+            Button("ブロックする") {
+                viewModel.blockTarget = tanka
+                showBlockAlert = true
+            }
+        }
+        .onAppear {
+            if tanka.id == viewModel.tankaList.last?.id {
+                Task { await viewModel.loadMore() }
+            }
+        }
+    }
+
+    private var composeButton: some View {
+        VStack(spacing: 8) {
+            if hasReachedDailyLimit {
+                Text("明日また詠めます")
+                    .font(.appCaption())
+                    .foregroundStyle(Color.appSubText)
+            }
+            FloatingActionButton {
+                path.append(FeedRoute.compose)
+            }
+            .disabled(hasReachedDailyLimit)
+            .opacity(hasReachedDailyLimit ? 0.4 : 1.0)
+        }
+        .padding(24)
     }
 }
