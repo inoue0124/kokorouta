@@ -5,7 +5,7 @@ import OpenAI from "openai";
 
 const openaiApiKey = defineSecret("OPENAI_API_KEY");
 
-const VALID_CATEGORIES = ["relationship", "love", "work", "health"];
+const VALID_CATEGORIES = ["relationship", "love", "work", "health", "other"];
 
 function validateWorryText(text: string): void {
   const trimmed = text.trim();
@@ -83,6 +83,7 @@ export const generateTanka = onCall(
       love: "恋愛",
       work: "仕事",
       health: "健康",
+      other: "その他",
     };
 
     const completion = await openai.chat.completions.create({
@@ -95,12 +96,12 @@ export const generateTanka = onCall(
             "あなたは日本の短歌の名人です。ユーザーの悩みに寄り添い、" +
             "心を癒す美しい短歌（五七五七七の31音）を一首だけ詠んでください。\n\n" +
             "以下の JSON 形式で返答してください:\n" +
-            '{ "isValidInput": true, "tankaText": "五文字 七文字 五文字 七文字 七文字" }\n\n' +
+            '{ "isValidInput": true, "tankaText": "五文字\\n七文字\\n五文字\\n七文字\\n七文字" }\n\n' +
             "isValidInput の判定基準:\n" +
             "- 意味のある日本語の悩み・相談であれば true\n" +
             "- 意味不明な文字列、テスト入力、悩みと無関係な内容であれば false\n\n" +
             "isValidInput が false の場合、tankaText は空文字にしてください。\n" +
-            "isValidInput が true の場合、各句の間にはスペースを入れてください。",
+            "isValidInput が true の場合、各句の間には改行（\\n）を入れてください。",
         },
         {
           role: "user",

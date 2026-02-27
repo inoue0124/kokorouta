@@ -1,5 +1,5 @@
-import FirebaseAuth
-import FirebaseFunctions
+@preconcurrency import FirebaseAuth
+@preconcurrency import FirebaseFunctions
 import Foundation
 
 final class APIClient: Sendable {

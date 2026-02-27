@@ -2,80 +2,116 @@
 import Testing
 
 @MainActor
-struct TankaResultViewModelTests {
+struct ComposeSubmitTests {
     @Test
-    func generateTanka_success_setsGeneratedTanka() async {
+    func submitTanka_success_setsResultPhase() async {
         let mock = MockTankaRepository()
         let expectedTanka = Tanka.mock()
         mock.stubbedGeneratedTanka = expectedTanka
-        let viewModel = TankaResultViewModel(tankaRepository: mock)
+        let viewModel = ComposeViewModel(tankaRepository: mock)
+        viewModel.selectCategory(.work)
+        viewModel.worryText = "テスト悩みのテキストです"
 
-        await viewModel.generateTanka(category: .work, worryText: "テスト悩み")
+        await viewModel.submitTanka()
 
         #expect(viewModel.generatedTanka?.id == expectedTanka.id)
-        #expect(viewModel.isLoading == false)
-        #expect(viewModel.error == nil)
+        if case .result = viewModel.phase {
+            // OK
+        } else {
+            Issue.record("Expected .result phase but got \(viewModel.phase)")
+        }
         #expect(mock.generateTankaCallCount == 1)
     }
 
     @Test
-    func generateTanka_failure_setsError() async {
+    func submitTanka_failure_setsErrorPhase() async {
         let mock = MockTankaRepository()
         mock.stubbedError = NetworkError.serverError(statusCode: 500)
-        let viewModel = TankaResultViewModel(tankaRepository: mock)
+        let viewModel = ComposeViewModel(tankaRepository: mock)
+        viewModel.selectCategory(.love)
+        viewModel.worryText = "テスト悩みのテキストです"
 
-        await viewModel.generateTanka(category: .love, worryText: "テスト")
+        await viewModel.submitTanka()
 
         #expect(viewModel.generatedTanka == nil)
-        #expect(viewModel.error != nil)
-        #expect(viewModel.isLoading == false)
+        if case .error = viewModel.phase {
+            // OK
+        } else {
+            Issue.record("Expected .error phase but got \(viewModel.phase)")
+        }
     }
 
     @Test
-    func generateTanka_retry_clearsError() async {
+    func submitTanka_retry_clearsError() async {
         let mock = MockTankaRepository()
         mock.stubbedError = NetworkError.noConnection
-        let viewModel = TankaResultViewModel(tankaRepository: mock)
+        let viewModel = ComposeViewModel(tankaRepository: mock)
+        viewModel.selectCategory(.work)
+        viewModel.worryText = "テスト悩みのテキストです"
 
-        await viewModel.generateTanka(category: .work, worryText: "テスト")
-        #expect(viewModel.error != nil)
+        await viewModel.submitTanka()
+        if case .error = viewModel.phase {
+            // OK
+        } else {
+            Issue.record("Expected .error phase")
+        }
 
         mock.stubbedError = nil
         mock.stubbedGeneratedTanka = Tanka.mock()
-        await viewModel.generateTanka(category: .work, worryText: "テスト")
+        await viewModel.retry()
 
-        #expect(viewModel.error == nil)
+        if case .result = viewModel.phase {
+            // OK
+        } else {
+            Issue.record("Expected .result phase after retry")
+        }
         #expect(viewModel.generatedTanka != nil)
     }
 
     @Test
-    func generateTanka_invalidArgument_setsValidationError() async {
+    func submitTanka_invalidArgument_setsValidationError() async {
         let mock = MockTankaRepository()
         mock.stubbedError = NetworkError.invalidArgument(message: "もう少し詳しく悩みを書いてください。")
-        let viewModel = TankaResultViewModel(tankaRepository: mock)
+        let viewModel = ComposeViewModel(tankaRepository: mock)
+        viewModel.selectCategory(.work)
+        viewModel.worryText = "あああああああああああ"
 
-        await viewModel.generateTanka(category: .work, worryText: "あああああああああああ")
+        await viewModel.submitTanka()
 
         #expect(viewModel.generatedTanka == nil)
-        #expect(viewModel.isLoading == false)
-        if case let .validation(message) = viewModel.error {
+        if case .error(let error) = viewModel.phase,
+           case let .validation(message) = error {
             #expect(message == "もう少し詳しく悩みを書いてください。")
         } else {
-            Issue.record("Expected .validation error but got \(String(describing: viewModel.error))")
+            Issue.record("Expected .validation error but got \(viewModel.phase)")
         }
     }
 
     @Test
-    func generateTanka_invalidArgument_doesNotSetDailyLimit() async {
+    func submitTanka_invalidArgument_doesNotSetDailyLimit() async {
         let mock = MockTankaRepository()
         mock.stubbedError = NetworkError.invalidArgument(message: "悩みの内容を具体的に書いてください。")
-        let viewModel = TankaResultViewModel(tankaRepository: mock)
+        let viewModel = ComposeViewModel(tankaRepository: mock)
+        viewModel.selectCategory(.health)
+        viewModel.worryText = "テストテストテスト"
 
-        await viewModel.generateTanka(category: .health, worryText: "テストテストテスト")
+        await viewModel.submitTanka()
 
         #expect(viewModel.generatedTanka == nil)
-        if case .rateLimited = viewModel.error {
-            Issue.record("Should not be rateLimited error")
-        }
+        #expect(viewModel.isRateLimited == false)
+    }
+
+    @Test
+    func resetToInput_returnsToInputPhase() async {
+        let mock = MockTankaRepository()
+        mock.stubbedError = NetworkError.invalidArgument(message: "テスト")
+        let viewModel = ComposeViewModel(tankaRepository: mock)
+        viewModel.selectCategory(.work)
+        viewModel.worryText = "テスト悩みのテキストです"
+
+        await viewModel.submitTanka()
+        viewModel.resetToInput()
+
+        #expect(viewModel.phase.isInput)
     }
 }
