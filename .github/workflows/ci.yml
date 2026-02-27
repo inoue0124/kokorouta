@@ -23,16 +23,16 @@ jobs:
 
       - name: Install SwiftLint
         run: |
-          curl -sL "https://github.com/realm/SwiftLint/releases/download/${SWIFTLINT_VERSION}/swiftlint_macos.zip" -o swiftlint.zip
-          unzip -o swiftlint.zip -d swiftlint_bin
-          sudo cp swiftlint_bin/swiftlint /usr/local/bin/swiftlint
+          curl -sL "https://github.com/realm/SwiftLint/releases/download/${SWIFTLINT_VERSION}/portable_swiftlint.zip" -o swiftlint.zip
+          unzip -o swiftlint.zip
+          sudo cp swiftlint /usr/local/bin/swiftlint
           swiftlint version
 
       - name: Install SwiftFormat
         run: |
-          curl -sL "https://github.com/nicklockwood/SwiftFormat/releases/download/${SWIFTFORMAT_VERSION}/swiftformat_macos.zip" -o swiftformat.zip
-          unzip -o swiftformat.zip -d swiftformat_bin
-          sudo cp swiftformat_bin/swiftformat /usr/local/bin/swiftformat
+          curl -sL "https://github.com/nicklockwood/SwiftFormat/releases/download/${SWIFTFORMAT_VERSION}/swiftformat.zip" -o swiftformat.zip
+          unzip -o swiftformat.zip
+          sudo cp swiftformat /usr/local/bin/swiftformat
           swiftformat --version
 
       - name: Run SwiftFormat
