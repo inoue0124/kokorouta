@@ -39,6 +39,7 @@ struct VerticalText: View {
     private func splitByNewlines(from text: String) -> [[Character]] {
         let segments = text.components(separatedBy: "\n")
             .flatMap { $0.components(separatedBy: "　") }
+            .flatMap { $0.components(separatedBy: " ") }
             .filter { !$0.isEmpty }
 
         return segments.reversed().map { Array($0) }

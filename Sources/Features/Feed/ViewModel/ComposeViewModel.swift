@@ -41,6 +41,10 @@ final class ComposeViewModel {
 
     // MARK: - Computed
 
+    var placeholderText: String {
+        selectedCategory?.placeholderText ?? "ここにお悩みを入力してください"
+    }
+
     var characterCount: Int {
         worryText.count
     }
