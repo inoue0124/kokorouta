@@ -1,6 +1,6 @@
-import FirebaseAuth
+@preconcurrency import FirebaseAuth
 import FirebaseCore
-import FirebaseFirestore
+@preconcurrency import FirebaseFirestore
 import SwiftUI
 
 @main
