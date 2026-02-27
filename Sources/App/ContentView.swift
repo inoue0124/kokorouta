@@ -12,9 +12,7 @@ struct ContentView: View {
                 }
 
             NavigationStack {
-                Text("わたしの歌")
-                    .font(.appTitle())
-                    .foregroundStyle(Color.appText)
+                MyTankaView()
             }
             .tag(AppTab.myTanka)
             .tabItem {

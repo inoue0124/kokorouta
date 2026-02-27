@@ -1,0 +1,53 @@
+import SwiftUI
+
+struct MyTankaView: View {
+    @Environment(\.tankaRepository) private var repository
+    @State private var viewModel: MyTankaViewModel?
+
+    var body: some View {
+        content
+            .background(Color.appBackground)
+            .navigationTitle("わたしの歌")
+            .navigationBarTitleDisplayMode(.inline)
+            .task {
+                if viewModel == nil {
+                    viewModel = MyTankaViewModel(tankaRepository: repository)
+                }
+                await viewModel?.loadMyTanka()
+            }
+            .refreshable {
+                await viewModel?.loadMyTanka()
+            }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if let viewModel {
+            if viewModel.isLoading, viewModel.tankaList.isEmpty {
+                LoadingView()
+            } else if let error = viewModel.error, viewModel.tankaList.isEmpty {
+                ErrorView(error: error) {
+                    Task { await viewModel.loadMyTanka() }
+                }
+            } else if viewModel.tankaList.isEmpty {
+                EmptyStateView(message: "まだ短歌がありません。\n今日の悩みを詠んでみましょう")
+            } else {
+                tankaList(viewModel: viewModel)
+            }
+        } else {
+            LoadingView()
+        }
+    }
+
+    private func tankaList(viewModel: MyTankaViewModel) -> some View {
+        ScrollView {
+            LazyVStack(spacing: 20) {
+                ForEach(viewModel.tankaList) { tanka in
+                    TankaCard(tanka: tanka)
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+        }
+    }
+}
