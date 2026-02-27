@@ -97,7 +97,7 @@ struct TankaCard: View {
             isLikedByMe: false,
             createdAt: Date()
         )
-    ) onLike: {
+    ) {
         // preview
     }
     .padding(20)
