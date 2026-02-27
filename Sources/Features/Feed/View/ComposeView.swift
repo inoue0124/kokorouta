@@ -131,6 +131,8 @@ struct ComposeView: View {
                     .frame(minHeight: 150)
                     .padding(12)
                     .focused($isTextEditorFocused)
+                    .accessibilityLabel("お悩み入力欄")
+                    .accessibilityHint("悩みを入力してください。最大300文字")
                     .onChange(of: viewModel.worryText) {
                         if viewModel.worryText.count > 300 {
                             viewModel.worryText = String(viewModel.worryText.prefix(300))
@@ -166,6 +168,7 @@ struct ComposeView: View {
                 Text("\(viewModel.characterCount)/300")
                     .font(.appCaption())
                     .foregroundStyle(Color.appSubText)
+                    .accessibilityLabel("\(viewModel.characterCount)文字入力済み、最大300文字")
             }
         }
     }
@@ -187,6 +190,8 @@ struct ComposeView: View {
                 )
         }
         .disabled(!viewModel.isValid)
+        .accessibilityLabel("短歌を詠む")
+        .accessibilityHint(viewModel.isValid ? "タップして短歌を生成します" : "悩みを入力すると有効になります")
         .alert("この内容で生成しますか？", isPresented: $viewModel.isShowingConfirmation) {
             Button("生成する") {
                 Task {
@@ -302,6 +307,8 @@ struct ComposeView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.appDivider.opacity(0.3))
         .clipShape(RoundedRectangle(cornerRadius: 8))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("注意: 1日1回だけ生成できます。じっくり悩みを言葉にしてみてください。")
     }
 
     // MARK: - Shared Components

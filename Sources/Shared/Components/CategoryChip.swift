@@ -22,6 +22,9 @@ struct CategoryChip: View {
                 )
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(category.displayName)
+        .accessibilityValue(isSelected ? "選択中" : "未選択")
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 }
 

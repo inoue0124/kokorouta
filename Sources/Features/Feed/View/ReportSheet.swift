@@ -2,11 +2,12 @@ import SwiftUI
 
 struct ReportSheet: View {
     let tanka: Tanka
-    let onSubmit: (ReportReason) async -> Void
+    let onSubmit: (ReportReason) async throws -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var selectedReason: ReportReason?
     @State private var isSubmitting = false
+    @State private var error: AppError?
 
     var body: some View {
         NavigationStack {
@@ -36,7 +37,16 @@ struct ReportSheet: View {
                             .padding(.vertical, 8)
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel(reason.displayName)
+                        .accessibilityValue(selectedReason == reason ? "選択中" : "未選択")
+                        .accessibilityAddTraits(selectedReason == reason ? [.isButton, .isSelected] : .isButton)
                     }
+                }
+
+                if let error {
+                    Text(error.localizedDescription)
+                        .font(.appCaption())
+                        .foregroundStyle(Color.red)
                 }
 
                 Spacer()
@@ -56,11 +66,16 @@ struct ReportSheet: View {
 
                     Button {
                         guard let reason = selectedReason else { return }
+                        error = nil
                         isSubmitting = true
                         Task {
-                            await onSubmit(reason)
+                            do {
+                                try await onSubmit(reason)
+                                dismiss()
+                            } catch {
+                                self.error = AppError(error)
+                            }
                             isSubmitting = false
-                            dismiss()
                         }
                     } label: {
                         if isSubmitting {
@@ -83,6 +98,8 @@ struct ReportSheet: View {
                         in: RoundedRectangle(cornerRadius: 8)
                     )
                     .disabled(selectedReason == nil || isSubmitting)
+                    .accessibilityLabel(isSubmitting ? "送信中" : "通報を送信")
+                    .accessibilityHint(selectedReason == nil ? "通報理由を選択してください" : "")
                 }
             }
             .padding(24)

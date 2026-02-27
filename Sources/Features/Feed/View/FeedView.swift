@@ -25,7 +25,7 @@ struct FeedView: View {
             .sheet(isPresented: $showReportSheet) {
                 if let target = viewModel?.reportTarget {
                     ReportSheet(tanka: target) { reason in
-                        await viewModel?.report(tankaID: target.id, reason: reason)
+                        try await viewModel?.report(tankaID: target.id, reason: reason)
                     }
                     .presentationDetents([.medium])
                 }
@@ -75,49 +75,66 @@ struct FeedView: View {
         ScrollView {
             LazyVStack(spacing: 20) {
                 ForEach(viewModel.tankaList) { tanka in
-                    TankaCard(tanka: tanka) {
-                        Task { await viewModel.toggleLike(for: tanka) }
-                    }
-                    .contextMenu {
-                        Button("通報する") {
-                            viewModel.reportTarget = tanka
-                            showReportSheet = true
-                        }
-                        Button("ブロックする") {
-                            viewModel.blockTarget = tanka
-                            showBlockAlert = true
-                        }
-                    }
-                    .onAppear {
-                        if tanka.id == viewModel.tankaList.last?.id {
-                            Task { await viewModel.loadMore() }
-                        }
-                    }
+                    tankaRow(tanka: tanka, viewModel: viewModel)
                 }
 
                 if viewModel.isLoadingMore {
                     ProgressView()
                         .tint(Color.appSubText)
                         .padding()
+                        .accessibilityLabel("さらに読み込み中")
+                }
+
+                if let paginationError = viewModel.paginationError {
+                    PaginationErrorView(error: paginationError) {
+                        Task { await viewModel.loadMore() }
+                    }
                 }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
         }
         .overlay(alignment: .bottomTrailing) {
-            VStack(spacing: 8) {
-                if hasReachedDailyLimit {
-                    Text("明日また詠めます")
-                        .font(.appCaption())
-                        .foregroundStyle(Color.appSubText)
-                }
-                FloatingActionButton {
-                    path.append(FeedRoute.compose)
-                }
-                .disabled(hasReachedDailyLimit)
-                .opacity(hasReachedDailyLimit ? 0.4 : 1.0)
-            }
-            .padding(24)
+            composeButton
         }
+    }
+
+    private func tankaRow(tanka: Tanka, viewModel: FeedViewModel) -> some View {
+        TankaCard(tanka: tanka) {
+            Task { await viewModel.toggleLike(for: tanka) }
+        }
+        .contextMenu {
+            Button("通報する") {
+                viewModel.reportTarget = tanka
+                showReportSheet = true
+            }
+            .accessibilityLabel("この短歌を通報する")
+            Button("ブロックする") {
+                viewModel.blockTarget = tanka
+                showBlockAlert = true
+            }
+            .accessibilityLabel("この投稿者をブロックする")
+        }
+        .onAppear {
+            if tanka.id == viewModel.tankaList.last?.id {
+                Task { await viewModel.loadMore() }
+            }
+        }
+    }
+
+    private var composeButton: some View {
+        VStack(spacing: 8) {
+            if hasReachedDailyLimit {
+                Text("明日また詠めます")
+                    .font(.appCaption())
+                    .foregroundStyle(Color.appSubText)
+            }
+            FloatingActionButton {
+                path.append(FeedRoute.compose)
+            }
+            .disabled(hasReachedDailyLimit)
+            .opacity(hasReachedDailyLimit ? 0.4 : 1.0)
+        }
+        .padding(24)
     }
 }
