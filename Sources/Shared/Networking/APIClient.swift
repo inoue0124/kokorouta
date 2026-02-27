@@ -8,8 +8,12 @@ final class APIClient: Sendable {
     private let functions: Functions
     private let decoder: JSONDecoder
 
-    init(functions: Functions = Functions.functions()) {
+    init(functions: Functions = Functions.functions(region: "asia-northeast1")) {
         self.functions = functions
+
+        #if DEBUG
+            self.functions.useEmulator(withHost: "localhost", port: 5001)
+        #endif
 
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
@@ -50,6 +54,8 @@ final class APIClient: Sendable {
             .noConnection
         case FunctionsErrorCode.deadlineExceeded.rawValue:
             .timeout
+        case FunctionsErrorCode.resourceExhausted.rawValue:
+            .rateLimited
         default:
             .serverError(statusCode: error.code)
         }

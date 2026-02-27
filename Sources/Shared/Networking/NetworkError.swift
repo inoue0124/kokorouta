@@ -6,4 +6,5 @@ enum NetworkError: Error, Sendable {
     case serverError(statusCode: Int)
     case decodingError
     case unauthorized
+    case rateLimited
 }
