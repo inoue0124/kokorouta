@@ -12,7 +12,7 @@ final class APIClient: Sendable {
         self.functions = functions
 
         if ProcessInfo.processInfo.environment["USE_EMULATOR"] == "1" {
-            self.functions.useEmulator(withHost: "localhost", port: 5001)
+            self.functions.useEmulator(withHost: "127.0.0.1", port: 5001)
         }
 
         let decoder = JSONDecoder()
