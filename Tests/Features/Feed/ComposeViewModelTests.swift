@@ -43,10 +43,18 @@ struct ComposeViewModelTests {
     }
 
     @Test
-    func isValid_categoryAnd201Chars_returnsFalse() {
+    func isValid_categoryAnd300Chars_returnsTrue() {
+        let viewModel = ComposeViewModel()
+        viewModel.selectCategory(.health)
+        viewModel.worryText = String(repeating: "あ", count: 300)
+        #expect(viewModel.isValid == true)
+    }
+
+    @Test
+    func isValid_categoryAnd301Chars_returnsFalse() {
         let viewModel = ComposeViewModel()
         viewModel.selectCategory(.relationship)
-        viewModel.worryText = String(repeating: "あ", count: 201)
+        viewModel.worryText = String(repeating: "あ", count: 301)
         #expect(viewModel.isValid == false)
     }
 

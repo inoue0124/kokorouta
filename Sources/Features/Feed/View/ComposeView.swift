@@ -67,8 +67,8 @@ struct ComposeView: View {
                 )
                 .focused($isTextEditorFocused)
                 .onChange(of: viewModel.worryText) {
-                    if viewModel.worryText.count > 200 {
-                        viewModel.worryText = String(viewModel.worryText.prefix(200))
+                    if viewModel.worryText.count > 300 {
+                        viewModel.worryText = String(viewModel.worryText.prefix(300))
                     }
                 }
 
@@ -81,7 +81,7 @@ struct ComposeView: View {
 
                 Spacer()
 
-                Text("\(viewModel.characterCount)/200")
+                Text("\(viewModel.characterCount)/300")
                     .font(.appCaption())
                     .foregroundStyle(Color.appSubText)
             }

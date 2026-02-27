@@ -41,6 +41,8 @@ struct TankaResultView: View {
             } else if let error = viewModel.error {
                 if case .rateLimited = error {
                     rateLimitedContent(error: error)
+                } else if case .validation = error {
+                    validationErrorContent(error: error)
                 } else {
                     ErrorView(error: error) {
                         Task {
@@ -56,6 +58,32 @@ struct TankaResultView: View {
             }
         } else {
             LoadingView(message: "短歌を詠んでいます...")
+        }
+    }
+
+    private func validationErrorContent(error: AppError) -> some View {
+        VStack(spacing: 20) {
+            Spacer()
+
+            Text(error.errorDescription ?? "")
+                .font(.appBody())
+                .foregroundStyle(Color.appText)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+
+            Button {
+                path.removeLast()
+            } label: {
+                Text("戻って修正する")
+                    .font(.appBody())
+                    .foregroundStyle(Color.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Color.appText, in: RoundedRectangle(cornerRadius: 8))
+            }
+            .padding(.horizontal, 24)
+
+            Spacer()
         }
     }
 

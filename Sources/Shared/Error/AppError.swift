@@ -29,6 +29,8 @@ enum AppError: Error, Sendable, LocalizedError {
                 self = .rateLimited(nextAvailableAt: Calendar.current.startOfDay(
                     for: Date()
                 ).addingTimeInterval(24 * 60 * 60))
+            case let .invalidArgument(message):
+                self = .validation(message)
             default:
                 self = .network(networkError)
             }
