@@ -6,6 +6,10 @@ final class ComposeViewModel {
     var selectedCategory: WorryCategory?
     var worryText: String = ""
 
+    var placeholderText: String {
+        selectedCategory?.placeholderText ?? "ここにお悩みを入力してください"
+    }
+
     var characterCount: Int {
         worryText.count
     }

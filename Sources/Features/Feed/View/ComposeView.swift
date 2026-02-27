@@ -55,24 +55,36 @@ struct ComposeView: View {
 
     private var textInputSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            TextEditor(text: $viewModel.worryText)
-                .font(.appBody())
-                .foregroundStyle(Color.appText)
-                .scrollContentBackground(.hidden)
-                .frame(minHeight: 150)
-                .padding(12)
-                .background(Color.appCardBackground)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.appDivider, lineWidth: 1)
-                )
-                .focused($isTextEditorFocused)
-                .onChange(of: viewModel.worryText) {
-                    if viewModel.worryText.count > 200 {
-                        viewModel.worryText = String(viewModel.worryText.prefix(200))
+            ZStack(alignment: .topLeading) {
+                TextEditor(text: $viewModel.worryText)
+                    .font(.appBody())
+                    .foregroundStyle(Color.appText)
+                    .scrollContentBackground(.hidden)
+                    .frame(minHeight: 150)
+                    .padding(12)
+                    .focused($isTextEditorFocused)
+                    .onChange(of: viewModel.worryText) {
+                        if viewModel.worryText.count > 200 {
+                            viewModel.worryText = String(viewModel.worryText.prefix(200))
+                        }
                     }
+
+                if viewModel.worryText.isEmpty {
+                    Text(viewModel.placeholderText)
+                        .font(.appBody())
+                        .foregroundStyle(Color.appSubText)
+                        .padding(12)
+                        .padding(.top, 8)
+                        .padding(.leading, 5)
+                        .allowsHitTesting(false)
                 }
+            }
+            .background(Color.appCardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.appDivider, lineWidth: 1)
+            )
 
             HStack {
                 if let message = viewModel.validationMessage {
