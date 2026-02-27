@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Mint
+        run: brew install mint
+
+      - name: Bootstrap tools
+        run: mint bootstrap
+
+      - name: Run SwiftFormat
+        run: mint run swiftformat --lint .
+
+      - name: Run SwiftLint
+        run: mint run swiftlint lint --strict --quiet
+
+  build-and-test:
+    name: Build & Test
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: brew install mint xcodegen
+
+      - name: Bootstrap tools
+        run: mint bootstrap
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build
+        run: fastlane build
+
+      - name: Test
+        run: fastlane test
