@@ -22,15 +22,19 @@ final class AccountDeleteViewModel {
     func deleteAccount() async {
         isDeleting = true
         error = nil
-        defer { isDeleting = false }
         do {
             try await tankaRepository.deleteAccount()
         } catch {
             self.error = AppError(error)
+            isDeleting = false
             return
         }
+        // サーバー側のデータ削除は完了済みのため、ローカルのサインアウト失敗は無視する
         try? Auth.auth().signOut()
+        isDeleting = false
         isDeleted = true
+        // Show confirmation briefly before resetting app
+        try? await Task.sleep(for: .seconds(1.5))
         NotificationCenter.default.post(name: .accountDidDelete, object: nil)
     }
 }
