@@ -191,17 +191,18 @@ struct ComposeView: View {
     // MARK: - Result Phase
 
     private func resultContent(tanka: Tanka) -> some View {
-        VStack(spacing: 32) {
+        VStack(spacing: 24) {
             Spacer()
 
-            AnimatedVerticalText(text: tanka.tankaText)
-                .padding(.horizontal, 20)
+            TankaCard(
+                tanka: tanka,
+                initialFlipped: true,
+                useAnimatedBackFace: true
+            )
 
             Text("あなたのための短歌です")
                 .font(.appCaption())
                 .foregroundStyle(Color.appSubText)
-
-            ShareButton(tanka: tanka)
 
             Spacer()
 

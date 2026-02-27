@@ -3,8 +3,24 @@ import SwiftUI
 struct TankaCard: View {
     let tanka: Tanka
     var onLike: (() -> Void)?
+    var initialFlipped: Bool
+    var useAnimatedBackFace: Bool
 
-    @State private var isFlipped = false
+    @State private var isFlipped: Bool
+    @State private var hasAnimatedOnce = false
+
+    init(
+        tanka: Tanka,
+        onLike: (() -> Void)? = nil,
+        initialFlipped: Bool = false,
+        useAnimatedBackFace: Bool = false
+    ) {
+        self.tanka = tanka
+        self.onLike = onLike
+        self.initialFlipped = initialFlipped
+        self.useAnimatedBackFace = useAnimatedBackFace
+        _isFlipped = State(initialValue: initialFlipped)
+    }
 
     var body: some View {
         ZStack {
@@ -27,6 +43,9 @@ struct TankaCard: View {
         .onTapGesture {
             withAnimation(.easeInOut(duration: 0.4)) {
                 isFlipped.toggle()
+            }
+            if !hasAnimatedOnce {
+                hasAnimatedOnce = true
             }
         }
     }
@@ -79,7 +98,11 @@ struct TankaCard: View {
     private var backFace: some View {
         VStack {
             Spacer()
-            VerticalText(text: tanka.tankaText)
+            if useAnimatedBackFace && !hasAnimatedOnce {
+                AnimatedVerticalText(text: tanka.tankaText)
+            } else {
+                VerticalText(text: tanka.tankaText)
+            }
             Spacer()
             HStack {
                 Spacer()
@@ -94,7 +117,7 @@ struct TankaCard: View {
     }
 }
 
-#Preview {
+#Preview("Feed Card") {
     TankaCard(
         tanka: Tanka(
             id: "1",
@@ -109,6 +132,25 @@ struct TankaCard: View {
     ) {
         // preview
     }
+    .padding(20)
+    .background(Color.appBackground)
+}
+
+#Preview("Result Card") {
+    TankaCard(
+        tanka: Tanka(
+            id: "1",
+            authorID: "author1",
+            category: .work,
+            worryText: "仕事がうまくいかなくて、毎日が辛いです。自分に自信が持てません。",
+            tankaText: "朝霧の\n晴れゆく空に\n光さし\n歩む一歩が\n道をつくらむ",
+            likeCount: 0,
+            isLikedByMe: false,
+            createdAt: Date()
+        ),
+        initialFlipped: true,
+        useAnimatedBackFace: true
+    )
     .padding(20)
     .background(Color.appBackground)
 }
