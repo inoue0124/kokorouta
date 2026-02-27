@@ -7,6 +7,7 @@ final class FeedViewModel {
     private(set) var isLoading = false
     private(set) var isLoadingMore = false
     private(set) var error: AppError?
+    private(set) var paginationError: AppError?
     private(set) var hasMore = true
     var reportTarget: Tanka?
     var blockTarget: Tanka?
@@ -21,6 +22,7 @@ final class FeedViewModel {
     func loadFeed() async {
         isLoading = true
         error = nil
+        paginationError = nil
         defer { isLoading = false }
         do {
             let response = try await tankaRepository.fetchFeed(limit: 20, afterID: nil)
@@ -34,6 +36,7 @@ final class FeedViewModel {
 
     func loadMore() async {
         guard hasMore, !isLoadingMore, !isLoading else { return }
+        paginationError = nil
         isLoadingMore = true
         defer { isLoadingMore = false }
         do {
@@ -42,7 +45,7 @@ final class FeedViewModel {
             hasMore = response.hasMore
             nextCursor = response.nextCursor
         } catch {
-            self.error = AppError(error)
+            paginationError = AppError(error)
         }
     }
 
