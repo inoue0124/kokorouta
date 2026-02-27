@@ -335,7 +335,7 @@ struct FeedViewModelPaginationTests {
     }
 
     @Test
-    func report_otherReason_passesCorrectReason() async {
+    func report_otherReason_passesCorrectReason() async throws {
         let mock = MockTankaRepository()
         mock.stubbedFeedResponse = FeedResponse(
             tankaList: [Tanka.mock(id: "t1")],
@@ -345,7 +345,7 @@ struct FeedViewModelPaginationTests {
         let viewModel = FeedViewModel(tankaRepository: mock)
         await viewModel.loadFeed()
 
-        await viewModel.report(tankaID: "t1", reason: .other)
+        try await viewModel.report(tankaID: "t1", reason: .other)
 
         #expect(mock.reportLastReason == .other)
         #expect(viewModel.tankaList.isEmpty)
