@@ -49,11 +49,26 @@ platform :ios do
       match(type: "appstore", readonly: true)
 
       increment_build_number
-      build_app(scheme: ENV["SCHEME"] || "App")
+      build_app(
+        scheme: ENV["SCHEME"] || "App",
+        export_method: "app-store"
+      )
       upload_to_testflight(skip_waiting_for_build_processing: true)
     rescue => e
       UI.error("Beta deployment failed: #{e.message}")
       raise e
     end
+  end
+
+  # ============================================================
+  # Gym (Build only)
+  # ============================================================
+  desc "Build the app for distribution (without uploading)"
+  lane :gym_build do
+    build_app(
+      scheme: ENV["SCHEME"] || "App",
+      export_method: "app-store",
+      skip_upload: true
+    )
   end
 end
