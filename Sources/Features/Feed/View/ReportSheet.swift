@@ -56,7 +56,6 @@ struct ReportSheet: View {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.appDivider, lineWidth: 1)
                     )
-                    .accessibilityLabel("キャンセル")
 
                     Button {
                         guard let reason = selectedReason else { return }

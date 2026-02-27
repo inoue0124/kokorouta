@@ -20,16 +20,9 @@ struct LikeButton: View {
             }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(likeAccessibilityLabel)
-        .accessibilityAddTraits(.isButton)
-    }
-
-    private var likeAccessibilityLabel: String {
-        let stateText = isLiked ? "いいね済み" : "いいね"
-        if count >= 1 {
-            return "\(stateText) \(count)件"
-        }
-        return stateText
+        .accessibilityLabel("いいね")
+        .accessibilityValue(isLiked ? "いいね済み \(count)件" : "\(count)件")
+        .accessibilityHint("タップしていいねを切り替える")
     }
 }
 

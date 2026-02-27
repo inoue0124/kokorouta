@@ -21,6 +21,7 @@ struct ShareButton: View {
             ShareSheet(items: [item.image])
         }
         .accessibilityLabel("共有")
+        .accessibilityHint("短歌を画像として共有します")
         .alert("画像の生成に失敗しました", isPresented: $showError) {
             Button("OK") {}
         }
