@@ -5,7 +5,7 @@ import OpenAI from "openai";
 
 const openaiApiKey = defineSecret("OPENAI_API_KEY");
 
-const VALID_CATEGORIES = ["relationship", "love", "work", "health"];
+const VALID_CATEGORIES = ["relationship", "love", "work", "health", "other"];
 
 export const generateTanka = onCall(
   {
@@ -56,6 +56,7 @@ export const generateTanka = onCall(
       love: "恋愛",
       work: "仕事",
       health: "健康",
+      other: "その他",
     };
 
     const completion = await openai.chat.completions.create({
