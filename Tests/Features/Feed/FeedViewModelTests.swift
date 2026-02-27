@@ -297,7 +297,7 @@ struct FeedViewModelPaginationTests {
     // MARK: - report
 
     @Test
-    func report_success_removesTankaFromList() async {
+    func report_success_removesTankaFromList() async throws {
         let mock = MockTankaRepository()
         mock.stubbedFeedResponse = FeedResponse(
             tankaList: [Tanka.mock(id: "t1"), Tanka.mock(id: "t2")],
@@ -307,7 +307,7 @@ struct FeedViewModelPaginationTests {
         let viewModel = FeedViewModel(tankaRepository: mock)
         await viewModel.loadFeed()
 
-        await viewModel.report(tankaID: "t1", reason: .inappropriate)
+        try await viewModel.report(tankaID: "t1", reason: .inappropriate)
 
         #expect(viewModel.tankaList.count == 1)
         #expect(viewModel.tankaList[0].id == "t2")
@@ -316,7 +316,7 @@ struct FeedViewModelPaginationTests {
     }
 
     @Test
-    func report_failure_setsError() async {
+    func report_failure_throwsError() async {
         let mock = MockTankaRepository()
         mock.stubbedFeedResponse = FeedResponse(
             tankaList: [Tanka.mock()],
@@ -327,9 +327,10 @@ struct FeedViewModelPaginationTests {
         await viewModel.loadFeed()
         mock.stubbedError = NetworkError.serverError(statusCode: 500)
 
-        await viewModel.report(tankaID: "tanka-1", reason: .spam)
+        await #expect(throws: (any Error).self) {
+            try await viewModel.report(tankaID: "tanka-1", reason: .spam)
+        }
 
-        #expect(viewModel.error != nil)
         #expect(viewModel.tankaList.count == 1)
     }
 

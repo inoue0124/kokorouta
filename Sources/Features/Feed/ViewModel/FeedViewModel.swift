@@ -63,13 +63,9 @@ final class FeedViewModel {
         }
     }
 
-    func report(tankaID: String, reason: ReportReason) async {
-        do {
-            try await tankaRepository.report(tankaID: tankaID, reason: reason)
-            tankaList.removeAll { $0.id == tankaID }
-        } catch {
-            self.error = AppError(error)
-        }
+    func report(tankaID: String, reason: ReportReason) async throws {
+        try await tankaRepository.report(tankaID: tankaID, reason: reason)
+        tankaList.removeAll { $0.id == tankaID }
     }
 
     func blockUser(authorID: String) async {
