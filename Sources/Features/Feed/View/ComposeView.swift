@@ -62,10 +62,10 @@ struct ComposeView: View {
         case .loading:
             LoadingView(message: "短歌を詠んでいます...")
                 .transition(.opacity)
-        case .result(let tanka):
+        case let .result(tanka):
             resultContent(tanka: tanka)
                 .transition(.opacity)
-        case .error(let error):
+        case let .error(error):
             errorContent(error: error, viewModel: viewModel)
                 .transition(.opacity)
         }
