@@ -136,4 +136,127 @@ struct ComposeViewModelTests {
         viewModel.selectCategory(.love)
         #expect(viewModel.selectedCategory == .love)
     }
+
+    // MARK: - placeholderText
+
+    @Test
+    func placeholderText_noCategory_returnsDefault() {
+        let viewModel = ComposeViewModel()
+        #expect(viewModel.placeholderText == "ここにお悩みを入力してください")
+    }
+
+    @Test
+    func placeholderText_withCategory_returnsCategoryPlaceholder() {
+        let viewModel = ComposeViewModel()
+        viewModel.selectCategory(.work)
+        #expect(viewModel.placeholderText == WorryCategory.work.placeholderText)
+    }
+
+    @Test
+    func placeholderText_changesWithCategory() {
+        let viewModel = ComposeViewModel()
+        viewModel.selectCategory(.love)
+        #expect(viewModel.placeholderText == WorryCategory.love.placeholderText)
+        viewModel.selectCategory(.health)
+        #expect(viewModel.placeholderText == WorryCategory.health.placeholderText)
+    }
+
+    // MARK: - isRateLimited
+
+    @Test
+    func isRateLimited_initialState_returnsFalse() {
+        let viewModel = ComposeViewModel()
+        #expect(viewModel.isRateLimited == false)
+    }
+
+    @Test
+    func isRateLimited_afterRateLimitError_returnsTrue() async {
+        let mock = MockTankaRepository()
+        mock.stubbedError = NetworkError.rateLimited
+        let viewModel = ComposeViewModel(tankaRepository: mock)
+        viewModel.selectCategory(.work)
+        viewModel.worryText = "テスト悩みのテキストです"
+
+        await viewModel.submitTanka()
+
+        #expect(viewModel.isRateLimited == true)
+    }
+
+    @Test
+    func isRateLimited_afterNonRateLimitError_returnsFalse() async {
+        let mock = MockTankaRepository()
+        mock.stubbedError = NetworkError.noConnection
+        let viewModel = ComposeViewModel(tankaRepository: mock)
+        viewModel.selectCategory(.work)
+        viewModel.worryText = "テスト悩みのテキストです"
+
+        await viewModel.submitTanka()
+
+        #expect(viewModel.isRateLimited == false)
+    }
+
+    // MARK: - Initial state
+
+    @Test
+    func initialState_hasCorrectDefaults() {
+        let viewModel = ComposeViewModel()
+
+        #expect(viewModel.selectedCategory == nil)
+        #expect(viewModel.worryText == "")
+        #expect(viewModel.isShowingConfirmation == false)
+        #expect(viewModel.phase.isInput)
+        #expect(viewModel.generatedTanka == nil)
+        #expect(viewModel.characterCount == 0)
+        #expect(viewModel.isValid == false)
+    }
+
+    // MARK: - submitTanka guard
+
+    @Test
+    func submitTanka_withoutCategory_doesNothing() async {
+        let mock = MockTankaRepository()
+        let viewModel = ComposeViewModel(tankaRepository: mock)
+        viewModel.worryText = "テスト悩みのテキストです"
+
+        await viewModel.submitTanka()
+
+        #expect(viewModel.phase.isInput)
+        #expect(mock.generateTankaCallCount == 0)
+    }
+
+    // MARK: - Phase transitions
+
+    @Test
+    func resetToInput_afterError_restoresInputPhase() async {
+        let mock = MockTankaRepository()
+        mock.stubbedError = NetworkError.noConnection
+        let viewModel = ComposeViewModel(tankaRepository: mock)
+        viewModel.selectCategory(.work)
+        viewModel.worryText = "テスト悩みのテキストです"
+
+        await viewModel.submitTanka()
+        #expect(!viewModel.phase.isInput)
+
+        viewModel.resetToInput()
+        #expect(viewModel.phase.isInput)
+    }
+
+    @Test
+    func resetToInput_afterResult_restoresInputPhase() async {
+        let mock = MockTankaRepository()
+        mock.stubbedGeneratedTanka = Tanka.mock()
+        let viewModel = ComposeViewModel(tankaRepository: mock)
+        viewModel.selectCategory(.love)
+        viewModel.worryText = "テスト悩みのテキストです"
+
+        await viewModel.submitTanka()
+        if case .result = viewModel.phase {
+            // OK
+        } else {
+            Issue.record("Expected .result phase")
+        }
+
+        viewModel.resetToInput()
+        #expect(viewModel.phase.isInput)
+    }
 }
