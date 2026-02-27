@@ -20,9 +20,15 @@ struct ContentView: View {
             }
 
             NavigationStack {
-                Text("設定")
-                    .font(.appTitle())
-                    .foregroundStyle(Color.appText)
+                SettingsView()
+                    .navigationDestination(for: SettingsRoute.self) { route in
+                        switch route {
+                        case .blockList:
+                            BlockListView()
+                        case .accountDelete:
+                            AccountDeleteView()
+                        }
+                    }
             }
             .tag(AppTab.settings)
             .tabItem {
