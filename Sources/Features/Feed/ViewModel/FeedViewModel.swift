@@ -45,7 +45,7 @@ final class FeedViewModel {
             hasMore = response.hasMore
             nextCursor = response.nextCursor
         } catch {
-            self.paginationError = AppError(error)
+            paginationError = AppError(error)
         }
     }
 
