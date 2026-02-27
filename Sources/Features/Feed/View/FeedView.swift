@@ -25,7 +25,7 @@ struct FeedView: View {
             .sheet(isPresented: $showReportSheet) {
                 if let target = viewModel?.reportTarget {
                     ReportSheet(tanka: target) { reason in
-                        await viewModel?.report(tankaID: target.id, reason: reason)
+                        try await viewModel?.report(tankaID: target.id, reason: reason)
                     }
                     .presentationDetents([.medium])
                 }
