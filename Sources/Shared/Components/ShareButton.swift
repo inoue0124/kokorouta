@@ -3,8 +3,8 @@ import SwiftUI
 struct ShareButton: View {
     let tanka: Tanka
 
-    @State private var shareImage: UIImage?
-    @State private var isShowingShareSheet = false
+    @State private var shareableImage: ShareableImage?
+    @State private var showError = false
 
     var body: some View {
         Button {
@@ -17,22 +17,30 @@ struct ShareButton: View {
             .font(.appCaption())
             .foregroundStyle(Color.appSubText)
         }
-        .sheet(isPresented: $isShowingShareSheet) {
-            if let shareImage {
-                ShareSheet(items: [shareImage])
-            }
+        .sheet(item: $shareableImage) { item in
+            ShareSheet(items: [item.image])
+        }
+        .alert("画像の生成に失敗しました", isPresented: $showError) {
+            Button("OK") {}
         }
     }
 
     @MainActor
     private func generateAndShare() {
         let renderer = ImageRenderer(content: TankaShareImage(tanka: tanka))
+        renderer.proposedSize = ProposedViewSize(width: 1080, height: 1080)
         renderer.scale = 1.0
         if let image = renderer.uiImage {
-            shareImage = image
-            isShowingShareSheet = true
+            shareableImage = ShareableImage(image: image)
+        } else {
+            showError = true
         }
     }
+}
+
+private struct ShareableImage: Identifiable {
+    let id = UUID()
+    let image: UIImage
 }
 
 struct ShareSheet: UIViewControllerRepresentable {
