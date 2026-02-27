@@ -8,7 +8,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   SWIFTLINT_VERSION: "0.63.2"
@@ -88,6 +88,11 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
+      # Required GitHub Secrets:
+      #   - APP_STORE_CONNECT_API_KEY_KEY_ID, APP_STORE_CONNECT_API_KEY_ISSUER_ID,
+      #     APP_STORE_CONNECT_API_KEY_KEY (App Store Connect API key)
+      #   - MATCH_PASSWORD, MATCH_GIT_BASIC_AUTHORIZATION (code signing via match)
+      #   - APP_IDENTIFIER must be set via Appfile or environment (see PR #48)
       - name: Deploy to TestFlight
         run: fastlane beta
         env:
