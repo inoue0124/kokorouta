@@ -24,6 +24,9 @@ platform :ios do
       scheme: ENV["SCHEME"] || "App",
       destination: "platform=iOS Simulator,name=iPhone 16",
       clean: true,
+      code_coverage: true,
+      output_directory: "fastlane/test_output",
+      result_bundle: true,
       xcargs: "CODE_SIGNING_ALLOWED=NO"
     )
   end
