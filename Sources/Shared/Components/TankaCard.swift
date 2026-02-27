@@ -34,25 +34,30 @@ struct TankaCard: View {
     // MARK: - Front Face
 
     private var frontFace: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(tanka.category.displayName)
-                .font(.appCaption())
-                .foregroundStyle(Color.appSubText)
+        VStack(spacing: 12) {
+            HStack {
+                Text(tanka.category.displayName)
+                    .font(.appCaption())
+                    .foregroundStyle(Color.appSubText)
+                Spacer()
+                Text(tanka.createdAt.shortDisplayString)
+                    .font(.appCaption())
+                    .foregroundStyle(Color.appSubText)
+            }
 
-            Text(tanka.worryText)
-                .font(.appBody())
-                .foregroundStyle(Color.appText)
-                .lineSpacing(6)
+            Spacer()
+
+            VerticalText(
+                text: tanka.worryText,
+                fontSize: 16,
+                font: .appBody(),
+                maxCharsPerColumn: 12
+            )
 
             Spacer()
 
             HStack {
-                Text(tanka.createdAt.shortDisplayString)
-                    .font(.appCaption())
-                    .foregroundStyle(Color.appSubText)
-
                 Spacer()
-
                 if let onLike {
                     LikeButton(
                         isLiked: tanka.isLikedByMe,
@@ -63,7 +68,7 @@ struct TankaCard: View {
             }
         }
         .padding(24)
-        .frame(maxWidth: .infinity, minHeight: 200, alignment: .topLeading)
+        .frame(maxWidth: .infinity, minHeight: 240, alignment: .topLeading)
         .background(Color.appCardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: .black.opacity(0.04), radius: 8, y: 2)
