@@ -51,6 +51,84 @@ struct FeedViewModelTests {
         #expect(viewModel.error == nil)
     }
 
+    // MARK: - loadFeed error recovery
+
+    @Test
+    func loadFeed_retry_clearsPreviousError() async {
+        let mock = MockTankaRepository()
+        mock.stubbedError = NetworkError.noConnection
+        let viewModel = FeedViewModel(tankaRepository: mock)
+        await viewModel.loadFeed()
+        #expect(viewModel.error != nil)
+
+        mock.stubbedError = nil
+        mock.stubbedFeedResponse = FeedResponse(
+            tankaList: [Tanka.mock()],
+            hasMore: false,
+            nextCursor: nil
+        )
+        await viewModel.loadFeed()
+
+        #expect(viewModel.error == nil)
+        #expect(viewModel.tankaList.count == 1)
+    }
+
+    @Test
+    func loadFeed_refresh_replacesExistingData() async {
+        let mock = MockTankaRepository()
+        mock.stubbedFeedResponse = FeedResponse(
+            tankaList: [Tanka.mock(id: "old-1")],
+            hasMore: false,
+            nextCursor: nil
+        )
+        let viewModel = FeedViewModel(tankaRepository: mock)
+        await viewModel.loadFeed()
+        #expect(viewModel.tankaList.count == 1)
+
+        mock.stubbedFeedResponse = FeedResponse(
+            tankaList: [Tanka.mock(id: "new-1"), Tanka.mock(id: "new-2")],
+            hasMore: true,
+            nextCursor: "cursor-new"
+        )
+        await viewModel.loadFeed()
+
+        #expect(viewModel.tankaList.count == 2)
+        #expect(viewModel.tankaList[0].id == "new-1")
+        #expect(viewModel.hasMore == true)
+    }
+
+    @Test
+    func loadFeed_passesNilAfterID() async {
+        let mock = MockTankaRepository()
+        mock.stubbedFeedResponse = FeedResponse(tankaList: [], hasMore: false, nextCursor: nil)
+        let viewModel = FeedViewModel(tankaRepository: mock)
+
+        await viewModel.loadFeed()
+
+        #expect(mock.fetchFeedLastAfterID == nil)
+    }
+
+    // MARK: - Initial state
+
+    @Test
+    func initialState_hasCorrectDefaults() {
+        let mock = MockTankaRepository()
+        let viewModel = FeedViewModel(tankaRepository: mock)
+
+        #expect(viewModel.tankaList.isEmpty)
+        #expect(viewModel.isLoading == false)
+        #expect(viewModel.isLoadingMore == false)
+        #expect(viewModel.error == nil)
+        #expect(viewModel.hasMore == true)
+        #expect(viewModel.reportTarget == nil)
+        #expect(viewModel.blockTarget == nil)
+    }
+}
+
+// MARK: - Pagination, Like, Report, Block Tests
+
+@MainActor
+struct FeedViewModelPaginationTests {
     // MARK: - loadMore
 
     @Test
@@ -106,6 +184,45 @@ struct FeedViewModelTests {
         #expect(mock.fetchFeedLastAfterID == "cursor-abc")
     }
 
+    // MARK: - loadMore error
+
+    @Test
+    func loadMore_failure_setsError() async {
+        let mock = MockTankaRepository()
+        mock.stubbedFeedResponse = FeedResponse(
+            tankaList: [Tanka.mock()],
+            hasMore: true,
+            nextCursor: "cursor-1"
+        )
+        let viewModel = FeedViewModel(tankaRepository: mock)
+        await viewModel.loadFeed()
+
+        mock.stubbedError = NetworkError.serverError(statusCode: 500)
+        await viewModel.loadMore()
+
+        #expect(viewModel.error != nil)
+        #expect(viewModel.isLoadingMore == false)
+        #expect(viewModel.tankaList.count == 1)
+    }
+
+    @Test
+    func loadMore_failure_preservesExistingData() async {
+        let mock = MockTankaRepository()
+        mock.stubbedFeedResponse = FeedResponse(
+            tankaList: [Tanka.mock(id: "t1")],
+            hasMore: true,
+            nextCursor: "cursor-1"
+        )
+        let viewModel = FeedViewModel(tankaRepository: mock)
+        await viewModel.loadFeed()
+
+        mock.stubbedError = NetworkError.timeout
+        await viewModel.loadMore()
+
+        #expect(viewModel.tankaList.count == 1)
+        #expect(viewModel.tankaList[0].id == "t1")
+    }
+
     // MARK: - toggleLike
 
     @Test
@@ -158,10 +275,29 @@ struct FeedViewModelTests {
         #expect(mock.unlikeCallCount == 0)
     }
 
+    // MARK: - toggleLike error
+
+    @Test
+    func toggleLike_failure_setsError() async {
+        let mock = MockTankaRepository()
+        mock.stubbedFeedResponse = FeedResponse(
+            tankaList: [Tanka.mock(likeCount: 0, isLikedByMe: false)],
+            hasMore: false,
+            nextCursor: nil
+        )
+        let viewModel = FeedViewModel(tankaRepository: mock)
+        await viewModel.loadFeed()
+
+        mock.stubbedError = NetworkError.serverError(statusCode: 500)
+        await viewModel.toggleLike(for: viewModel.tankaList[0])
+
+        #expect(viewModel.error != nil)
+    }
+
     // MARK: - report
 
     @Test
-    func report_success_removesTankaFromList() async {
+    func report_success_removesTankaFromList() async throws {
         let mock = MockTankaRepository()
         mock.stubbedFeedResponse = FeedResponse(
             tankaList: [Tanka.mock(id: "t1"), Tanka.mock(id: "t2")],
@@ -171,7 +307,7 @@ struct FeedViewModelTests {
         let viewModel = FeedViewModel(tankaRepository: mock)
         await viewModel.loadFeed()
 
-        await viewModel.report(tankaID: "t1", reason: .inappropriate)
+        try await viewModel.report(tankaID: "t1", reason: .inappropriate)
 
         #expect(viewModel.tankaList.count == 1)
         #expect(viewModel.tankaList[0].id == "t2")
@@ -180,7 +316,7 @@ struct FeedViewModelTests {
     }
 
     @Test
-    func report_failure_setsError() async {
+    func report_failure_throwsError() async {
         let mock = MockTankaRepository()
         mock.stubbedFeedResponse = FeedResponse(
             tankaList: [Tanka.mock()],
@@ -191,10 +327,28 @@ struct FeedViewModelTests {
         await viewModel.loadFeed()
         mock.stubbedError = NetworkError.serverError(statusCode: 500)
 
-        await viewModel.report(tankaID: "tanka-1", reason: .spam)
+        await #expect(throws: (any Error).self) {
+            try await viewModel.report(tankaID: "tanka-1", reason: .spam)
+        }
 
-        #expect(viewModel.error != nil)
         #expect(viewModel.tankaList.count == 1)
+    }
+
+    @Test
+    func report_otherReason_passesCorrectReason() async {
+        let mock = MockTankaRepository()
+        mock.stubbedFeedResponse = FeedResponse(
+            tankaList: [Tanka.mock(id: "t1")],
+            hasMore: false,
+            nextCursor: nil
+        )
+        let viewModel = FeedViewModel(tankaRepository: mock)
+        await viewModel.loadFeed()
+
+        await viewModel.report(tankaID: "t1", reason: .other)
+
+        #expect(mock.reportLastReason == .other)
+        #expect(viewModel.tankaList.isEmpty)
     }
 
     // MARK: - blockUser

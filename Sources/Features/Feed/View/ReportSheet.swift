@@ -2,11 +2,12 @@ import SwiftUI
 
 struct ReportSheet: View {
     let tanka: Tanka
-    let onSubmit: (ReportReason) async -> Void
+    let onSubmit: (ReportReason) async throws -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var selectedReason: ReportReason?
     @State private var isSubmitting = false
+    @State private var error: AppError?
 
     var body: some View {
         NavigationStack {
@@ -42,6 +43,12 @@ struct ReportSheet: View {
                     }
                 }
 
+                if let error {
+                    Text(error.localizedDescription)
+                        .font(.appCaption())
+                        .foregroundStyle(Color.red)
+                }
+
                 Spacer()
 
                 HStack(spacing: 12) {
@@ -59,11 +66,16 @@ struct ReportSheet: View {
 
                     Button {
                         guard let reason = selectedReason else { return }
+                        error = nil
                         isSubmitting = true
                         Task {
-                            await onSubmit(reason)
+                            do {
+                                try await onSubmit(reason)
+                                dismiss()
+                            } catch {
+                                self.error = AppError(error)
+                            }
                             isSubmitting = false
-                            dismiss()
                         }
                     } label: {
                         if isSubmitting {
