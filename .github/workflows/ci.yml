@@ -15,7 +15,7 @@ jobs:
     name: Lint
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install Mint
         run: brew install mint
@@ -33,7 +33,7 @@ jobs:
     name: Build & Test
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install tools
         run: brew install mint xcodegen
