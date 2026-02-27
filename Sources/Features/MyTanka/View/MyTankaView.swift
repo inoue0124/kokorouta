@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MyTankaView: View {
     @Environment(\.tankaRepository) private var repository
+    @Binding var selectedTab: AppTab
     @State private var viewModel: MyTankaViewModel?
 
     var body: some View {
@@ -30,7 +31,12 @@ struct MyTankaView: View {
                     Task { await viewModel.loadMyTanka() }
                 }
             } else if viewModel.tankaList.isEmpty {
-                EmptyStateView(message: "まだ短歌がありません。\n今日の悩みを詠んでみましょう")
+                EmptyStateView(
+                    message: "まだ短歌がありません。\n今日の悩みを詠んでみましょう",
+                    actionLabel: "詠んでみる"
+                ) {
+                    selectedTab = .feed
+                }
             } else {
                 tankaList(viewModel: viewModel)
             }

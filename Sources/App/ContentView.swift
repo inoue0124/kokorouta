@@ -12,7 +12,7 @@ struct ContentView: View {
                 }
 
             NavigationStack {
-                MyTankaView()
+                MyTankaView(selectedTab: $selectedTab)
             }
             .tag(AppTab.myTanka)
             .tabItem {
