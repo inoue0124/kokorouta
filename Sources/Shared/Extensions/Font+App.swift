@@ -3,7 +3,7 @@ import SwiftUI
 extension Font {
     /// 短歌表示用: 明朝体
     static func tankaFont(size: CGFloat) -> Font {
-        .custom("HiraginoMincho-W3", size: size)
+        .custom("HiraMinProN-W3", size: size)
     }
 
     /// 見出し用: システムフォント（軽め）
