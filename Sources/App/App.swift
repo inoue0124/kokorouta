@@ -9,9 +9,9 @@ struct MainApp: SwiftUI.App {
     init() {
         FirebaseApp.configure()
 
-        #if DEBUG
+        if ProcessInfo.processInfo.environment["USE_EMULATOR"] == "1" {
             Auth.auth().useEmulator(withHost: "localhost", port: 9099)
-        #endif
+        }
     }
 
     var body: some Scene {
