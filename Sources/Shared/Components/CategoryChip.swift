@@ -9,7 +9,7 @@ struct CategoryChip: View {
         Button(action: action) {
             Text(category.displayName)
                 .font(.appBody(size: 14))
-                .foregroundStyle(isSelected ? Color.white : Color.appText)
+                .foregroundStyle(isSelected ? Color.appBackground : Color.appText)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 .background(

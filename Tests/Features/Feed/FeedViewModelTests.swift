@@ -275,13 +275,33 @@ struct FeedViewModelPaginationTests {
         #expect(mock.unlikeCallCount == 0)
     }
 
-    // MARK: - toggleLike error
+    // MARK: - toggleLike server sync
 
     @Test
-    func toggleLike_failure_setsError() async {
+    func toggleLike_like_syncsServerLikeCount() async {
+        let mock = MockTankaRepository()
+        mock.stubbedLikeResponse = LikeResponse(likeCount: 5)
+        mock.stubbedFeedResponse = FeedResponse(
+            tankaList: [Tanka.mock(likeCount: 3, isLikedByMe: false)],
+            hasMore: false,
+            nextCursor: nil
+        )
+        let viewModel = FeedViewModel(tankaRepository: mock)
+        await viewModel.loadFeed()
+
+        await viewModel.toggleLike(for: viewModel.tankaList[0])
+
+        #expect(viewModel.tankaList[0].isLikedByMe == true)
+        #expect(viewModel.tankaList[0].likeCount == 5)
+    }
+
+    // MARK: - toggleLike error rollback
+
+    @Test
+    func toggleLike_likeFailure_rollsBackState() async {
         let mock = MockTankaRepository()
         mock.stubbedFeedResponse = FeedResponse(
-            tankaList: [Tanka.mock(likeCount: 0, isLikedByMe: false)],
+            tankaList: [Tanka.mock(likeCount: 3, isLikedByMe: false)],
             hasMore: false,
             nextCursor: nil
         )
@@ -291,6 +311,27 @@ struct FeedViewModelPaginationTests {
         mock.stubbedError = NetworkError.serverError(statusCode: 500)
         await viewModel.toggleLike(for: viewModel.tankaList[0])
 
+        #expect(viewModel.tankaList[0].isLikedByMe == false)
+        #expect(viewModel.tankaList[0].likeCount == 3)
+        #expect(viewModel.error != nil)
+    }
+
+    @Test
+    func toggleLike_unlikeFailure_rollsBackState() async {
+        let mock = MockTankaRepository()
+        mock.stubbedFeedResponse = FeedResponse(
+            tankaList: [Tanka.mock(likeCount: 5, isLikedByMe: true)],
+            hasMore: false,
+            nextCursor: nil
+        )
+        let viewModel = FeedViewModel(tankaRepository: mock)
+        await viewModel.loadFeed()
+
+        mock.stubbedError = NetworkError.serverError(statusCode: 500)
+        await viewModel.toggleLike(for: viewModel.tankaList[0])
+
+        #expect(viewModel.tankaList[0].isLikedByMe == true)
+        #expect(viewModel.tankaList[0].likeCount == 5)
         #expect(viewModel.error != nil)
     }
 

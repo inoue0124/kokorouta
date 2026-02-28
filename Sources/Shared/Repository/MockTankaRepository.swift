@@ -64,7 +64,7 @@
 
         func fetchLikedTanka() async throws -> [Tanka] {
             try await Task.sleep(for: .milliseconds(300))
-            return tankaList.filter { $0.isLikedByMe }
+            return tankaList.filter(\.isLikedByMe)
         }
 
         func like(tankaID: String) async throws -> LikeResponse {

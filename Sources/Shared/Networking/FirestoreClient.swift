@@ -294,8 +294,9 @@ final class FirestoreClient: Sendable {
 
         let likeDoc = try await doc.reference.collection("likes").document(uid).getDocument()
 
-        guard let category = (data["category"] as? String).flatMap(WorryCategory.init(rawValue:)),
-              let createdAtTimestamp = data["createdAt"] as? Timestamp
+        guard
+            let category = (data["category"] as? String).flatMap(WorryCategory.init(rawValue:)),
+            let createdAtTimestamp = data["createdAt"] as? Timestamp
         else {
             throw NetworkError.decodingError
         }
