@@ -13,6 +13,7 @@ struct SettingsView: View {
                         .foregroundStyle(.red)
                 }
             }
+            .listRowBackground(Color.appCardBackground)
 
             Section("情報") {
                 HStack {
@@ -22,6 +23,7 @@ struct SettingsView: View {
                         .foregroundStyle(Color.appSubText)
                 }
             }
+            .listRowBackground(Color.appCardBackground)
         }
         .scrollContentBackground(.hidden)
         .background(Color.appBackground)
