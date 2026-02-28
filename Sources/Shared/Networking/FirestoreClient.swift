@@ -108,6 +108,48 @@ final class FirestoreClient: Sendable {
         }
     }
 
+    // MARK: - Liked Tanka
+
+    func fetchLikedTanka() async throws -> [Tanka] {
+        let uid = try currentUserID
+
+        // collectionGroup で likes サブコレクションを横断検索
+        // likerID フィールドで自分のいいねのみ取得
+        let likesSnapshot = try await db
+            .collectionGroup("likes")
+            .whereField("likerID", isEqualTo: uid)
+            .order(by: "createdAt", descending: true)
+            .getDocuments()
+
+        // 親パスから tankaID を抽出
+        let tankaIDs = likesSnapshot.documents.compactMap { doc -> String? in
+            // パス: tanka/{tankaID}/likes/{uid}
+            let pathComponents = doc.reference.path.split(separator: "/")
+            guard pathComponents.count >= 2 else { return nil }
+            return String(pathComponents[1])
+        }
+
+        guard !tankaIDs.isEmpty else { return [] }
+
+        // 各短歌ドキュメントを並列フェッチ
+        return try await withThrowingTaskGroup(of: Tanka?.self) { group in
+            for tankaID in tankaIDs {
+                group.addTask {
+                    let doc = try await self.db.collection("tanka").document(tankaID).getDocument()
+                    guard doc.exists else { return nil }
+                    return try await self.mapDocumentToTanka(doc, uid: uid)
+                }
+            }
+            var results: [Tanka] = []
+            for try await tanka in group {
+                if let tanka {
+                    results.append(tanka)
+                }
+            }
+            return results.sorted { $0.createdAt > $1.createdAt }
+        }
+    }
+
     // MARK: - Like
 
     func like(tankaID: String) async throws -> LikeResponse {
@@ -149,7 +191,10 @@ final class FirestoreClient: Sendable {
             let currentCount = tankaDoc.data()?["likeCount"] as? Int ?? 0
             let updatedCount = currentCount + 1
 
-            transaction.setData(["createdAt": FieldValue.serverTimestamp()], forDocument: likeRef)
+            transaction.setData([
+                "likerID": uid,
+                "createdAt": FieldValue.serverTimestamp(),
+            ], forDocument: likeRef)
             transaction.updateData(["likeCount": updatedCount], forDocument: tankaRef)
 
             return updatedCount

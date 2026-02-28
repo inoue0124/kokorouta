@@ -19,6 +19,10 @@ final class TankaRepository: TankaRepositoryProtocol {
         try await firestoreClient.fetchMyTanka()
     }
 
+    func fetchLikedTanka() async throws -> [Tanka] {
+        try await firestoreClient.fetchLikedTanka()
+    }
+
     func like(tankaID: String) async throws -> LikeResponse {
         try await firestoreClient.like(tankaID: tankaID)
     }

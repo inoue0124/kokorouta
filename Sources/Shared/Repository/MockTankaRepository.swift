@@ -62,6 +62,11 @@
             return tankaList.filter { $0.authorID == "me" }
         }
 
+        func fetchLikedTanka() async throws -> [Tanka] {
+            try await Task.sleep(for: .milliseconds(300))
+            return tankaList.filter { $0.isLikedByMe }
+        }
+
         func like(tankaID: String) async throws -> LikeResponse {
             likedIDs.insert(tankaID)
             if let index = tankaList.firstIndex(where: { $0.id == tankaID }) {
