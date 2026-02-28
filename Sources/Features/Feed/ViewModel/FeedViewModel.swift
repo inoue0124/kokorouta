@@ -13,6 +13,7 @@ final class FeedViewModel {
     var blockTarget: Tanka?
 
     private var nextCursor: String?
+    private var likingTankaIDs: Set<String> = []
     private let tankaRepository: any TankaRepositoryProtocol
 
     init(tankaRepository: any TankaRepositoryProtocol) {
@@ -50,18 +51,36 @@ final class FeedViewModel {
     }
 
     func toggleLike(for tanka: Tanka) async {
-        guard let index = tankaList.firstIndex(where: { $0.id == tanka.id }) else { return }
+        guard !likingTankaIDs.contains(tanka.id),
+              let index = tankaList.firstIndex(where: { $0.id == tanka.id })
+        else { return }
+
+        likingTankaIDs.insert(tanka.id)
+        defer { likingTankaIDs.remove(tanka.id) }
+
+        let wasLiked = tanka.isLikedByMe
+        let previousCount = tanka.likeCount
+
+        // Optimistic update
+        tankaList[index].isLikedByMe = !wasLiked
+        tankaList[index].likeCount = wasLiked ? max(0, previousCount - 1) : previousCount + 1
+
         do {
-            if tanka.isLikedByMe {
-                let response = try await tankaRepository.unlike(tankaID: tanka.id)
-                tankaList[index].isLikedByMe = false
-                tankaList[index].likeCount = response.likeCount
+            let response = if wasLiked {
+                try await tankaRepository.unlike(tankaID: tanka.id)
             } else {
-                let response = try await tankaRepository.like(tankaID: tanka.id)
-                tankaList[index].isLikedByMe = true
-                tankaList[index].likeCount = response.likeCount
+                try await tankaRepository.like(tankaID: tanka.id)
+            }
+            // Sync with server value
+            if let current = tankaList.firstIndex(where: { $0.id == tanka.id }) {
+                tankaList[current].likeCount = response.likeCount
             }
         } catch {
+            // Rollback on failure
+            if let current = tankaList.firstIndex(where: { $0.id == tanka.id }) {
+                tankaList[current].isLikedByMe = wasLiked
+                tankaList[current].likeCount = previousCount
+            }
             self.error = AppError(error)
         }
     }
