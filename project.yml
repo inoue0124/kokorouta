@@ -34,7 +34,6 @@ targets:
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: "4"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        INFOPLIST_KEY_CFBundleDisplayName: こころうた
     dependencies:
       - package: Firebase
         product: FirebaseAuth
