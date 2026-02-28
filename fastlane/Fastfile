@@ -45,7 +45,7 @@ platform :ios do
       xcargs: "DEVELOPMENT_TEAM=3HFF5L44FR"
     )
     upload_to_testflight(
-      apple_id: "inoue-yusuke@carri-age.com",
+      username: "inoue-yusuke@carri-age.com",
       skip_waiting_for_build_processing: true
     )
   end

@@ -1,17 +1,17 @@
-fastlane ドキュメント
+fastlane documentation
 ----
 
-# インストール
+# Installation
 
-Xcode コマンドラインツールの最新版がインストールされていることを確認してください:
+Make sure you have the latest version of the Xcode command line tools installed:
 
 ```sh
 xcode-select --install
 ```
 
-fastlane のインストール手順は [Installing fastlane](https://docs.fastlane.tools/#installing-fastlane) を参照してください。
+For _fastlane_ installation instructions, see [Installing _fastlane_](https://docs.fastlane.tools/#installing-fastlane)
 
-# 利用可能なアクション
+# Available Actions
 
 ## iOS
 
@@ -21,7 +21,7 @@ fastlane のインストール手順は [Installing fastlane](https://docs.fastl
 [bundle exec] fastlane ios build
 ```
 
-アプリをビルドする（Debug / iOS Simulator）
+Build the app
 
 ### ios test
 
@@ -29,7 +29,7 @@ fastlane のインストール手順は [Installing fastlane](https://docs.fastl
 [bundle exec] fastlane ios test
 ```
 
-ユニットテストを実行する（iPhone 16 シミュレータ）
+Run tests
 
 ### ios beta
 
@@ -37,10 +37,28 @@ fastlane のインストール手順は [Installing fastlane](https://docs.fastl
 [bundle exec] fastlane ios beta
 ```
 
-ビルド番号をインクリメントし、アーカイブして TestFlight にアップロードする
+Build and upload to TestFlight (local)
+
+### ios beta_ci
+
+```sh
+[bundle exec] fastlane ios beta_ci
+```
+
+Build and upload to TestFlight (CI)
+
+### ios release
+
+```sh
+[bundle exec] fastlane ios release
+```
+
+Build and upload to App Store for review
 
 ----
 
-この README.md は [fastlane](https://fastlane.tools) の実行時に自動生成されます。
+This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
 
-詳細は [docs.fastlane.tools](https://docs.fastlane.tools) を参照してください。
+More information about _fastlane_ can be found on [fastlane.tools](https://fastlane.tools).
+
+The documentation of _fastlane_ can be found on [docs.fastlane.tools](https://docs.fastlane.tools).
