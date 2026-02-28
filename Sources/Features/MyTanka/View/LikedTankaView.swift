@@ -23,21 +23,26 @@ struct LikedTankaView: View {
     @ViewBuilder
     private var content: some View {
         if let viewModel {
-            if viewModel.isLoading, viewModel.tankaList.isEmpty {
-                LoadingView()
-            } else if let error = viewModel.error, viewModel.tankaList.isEmpty {
-                ErrorView(error: error) {
-                    Task { await viewModel.loadLikedTanka() }
-                }
-            } else if viewModel.tankaList.isEmpty {
-                EmptyStateView(
-                    message: "いいねした短歌はまだありません"
-                )
-            } else {
-                tankaList(viewModel: viewModel)
-            }
+            likedTankaContent(viewModel: viewModel)
         } else {
             LoadingView()
+        }
+    }
+
+    @ViewBuilder
+    private func likedTankaContent(viewModel: LikedTankaViewModel) -> some View {
+        if viewModel.isLoading, viewModel.tankaList.isEmpty {
+            LoadingView()
+        } else if let error = viewModel.error, viewModel.tankaList.isEmpty {
+            ErrorView(error: error) {
+                Task { await viewModel.loadLikedTanka() }
+            }
+        } else if viewModel.tankaList.isEmpty {
+            EmptyStateView(
+                message: "いいねした短歌はまだありません"
+            )
+        } else {
+            tankaList(viewModel: viewModel)
         }
     }
 

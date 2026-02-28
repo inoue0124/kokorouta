@@ -1,7 +1,8 @@
 @testable import App
 import Foundation
 
-final class MockTankaRepository: TankaRepositoryProtocol, @unchecked Sendable {
+@MainActor
+final class MockTankaRepository: TankaRepositoryProtocol {
     var stubbedFeedResponse = FeedResponse(tankaList: [], hasMore: false, nextCursor: nil)
     var stubbedLikeResponse = LikeResponse(likeCount: 0)
     var stubbedGeneratedTanka: Tanka?
