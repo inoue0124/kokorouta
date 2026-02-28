@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プライバシーポリシー - こころうた</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; color: #333; line-height: 1.8; background: #fafaf8; }
+        .container { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
+        h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; color: #222; }
+        .app-name { font-size: 14px; color: #888; margin-bottom: 40px; }
+        h2 { font-size: 18px; font-weight: 600; margin-top: 32px; margin-bottom: 12px; color: #222; }
+        p, li { font-size: 15px; margin-bottom: 12px; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 8px; }
+        .updated { font-size: 13px; color: #999; margin-top: 48px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>プライバシーポリシー</h1>
+        <p class="app-name">こころうた（kokorouta）</p>
+
+        <h2>1. はじめに</h2>
+        <p>Carriage Inc.（以下「当社」）は、こころうた（以下「本アプリ」）におけるユーザーのプライバシーを尊重し、個人情報の保護に努めます。本プライバシーポリシーは、本アプリがどのような情報を収集し、どのように利用するかについて説明します。</p>
+
+        <h2>2. 収集する情報</h2>
+        <p>本アプリは、ユーザーの個人情報（氏名、メールアドレス、電話番号等）を一切収集しません。</p>
+        <p>本アプリが取り扱う情報は以下の通りです：</p>
+        <ul>
+            <li><strong>匿名ユーザーID</strong>：Firebase Anonymous Authentication により自動生成される匿名の識別子です。個人を特定する情報は含まれません。</li>
+            <li><strong>悩みテキスト</strong>：ユーザーが入力した悩みの文章（10〜300文字）です。</li>
+            <li><strong>短歌テキスト</strong>：AIにより生成された短歌です。</li>
+            <li><strong>カテゴリ選択</strong>：ユーザーが選択した悩みのカテゴリ（人間関係・恋愛・仕事・健康・その他）です。</li>
+            <li><strong>いいね情報</strong>：ユーザーが「いいね」した短歌の記録です。</li>
+            <li><strong>通報・ブロック情報</strong>：ユーザーが行った通報やブロックの記録です。</li>
+        </ul>
+
+        <h2>3. 情報の利用目的</h2>
+        <p>収集した情報は、以下の目的でのみ利用します：</p>
+        <ul>
+            <li>AIによる短歌の生成</li>
+            <li>フィードでの短歌の公開・共有</li>
+            <li>不適切なコンテンツの検出と対応</li>
+            <li>アプリの機能改善</li>
+        </ul>
+
+        <h2>4. 情報の公開</h2>
+        <p>ユーザーが入力した悩みテキストおよび生成された短歌は、フィードを通じて他のユーザーに公開されます。入力画面には「個人情報は含めないでください。短歌は他の方にも公開されます。」と注意喚起を表示しています。</p>
+
+        <h2>5. 第三者サービスとの連携</h2>
+        <p>本アプリは以下の第三者サービスを利用しています：</p>
+        <ul>
+            <li><strong>Firebase（Google LLC）</strong>：匿名認証、データベース（Cloud Firestore）、サーバー処理（Cloud Functions）に使用しています。Googleのプライバシーポリシーは <a href="https://policies.google.com/privacy">こちら</a> をご確認ください。</li>
+            <li><strong>OpenAI</strong>：短歌の生成および入力内容の検証に使用しています。悩みテキストはFirebase Cloud Functionsを経由してOpenAI APIに送信されます。OpenAIのプライバシーポリシーは <a href="https://openai.com/privacy">こちら</a> をご確認ください。</li>
+        </ul>
+
+        <h2>6. データの保存と削除</h2>
+        <p>データはGoogle Cloud（asia-northeast1リージョン）に保存されます。ユーザーはいつでも設定画面からアカウントを削除でき、削除時にはユーザーに関連するすべてのデータ（短歌、いいね、ブロック情報、認証情報）が完全に消去されます。</p>
+
+        <h2>7. トラッキング</h2>
+        <p>本アプリは、広告トラッキングやサードパーティへのデータ共有を一切行いません。App Tracking Transparency（ATT）による追跡は行っていません。</p>
+
+        <h2>8. お子様のプライバシー</h2>
+        <p>本アプリは12歳以上を対象としています。13歳未満のお子様から意図的に個人情報を収集することはありません。</p>
+
+        <h2>9. ポリシーの変更</h2>
+        <p>本プライバシーポリシーは、必要に応じて更新されることがあります。重要な変更がある場合は、アプリ内で通知します。</p>
+
+        <h2>10. お問い合わせ</h2>
+        <p>プライバシーに関するご質問やお問い合わせは、以下のメールアドレスまでご連絡ください。</p>
+        <p><strong>メール</strong>：inoue-yusuke@carri-age.com</p>
+
+        <p class="updated">最終更新日：2026年2月28日</p>
+    </div>
+</body>
+</html>
