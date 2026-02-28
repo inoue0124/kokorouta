@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct FeedNavigationView: View {
+    @Environment(\.tankaRepository) private var repository
     @State private var path = NavigationPath()
     @State private var hasReachedDailyLimit = false
 
@@ -16,6 +17,24 @@ struct FeedNavigationView: View {
                         )
                     }
                 }
+        }
+        .task {
+            await checkDailyLimit()
+        }
+    }
+
+    private func checkDailyLimit() async {
+        do {
+            let myTankaList = try await repository.fetchMyTanka()
+            let calendar = Calendar.current
+            let hasCreatedToday = myTankaList.contains { tanka in
+                calendar.isDateInToday(tanka.createdAt)
+            }
+            if hasCreatedToday {
+                hasReachedDailyLimit = true
+            }
+        } catch {
+            // 取得に失敗した場合はボタンを有効のままにする（サーバー側でも制限される）
         }
     }
 }
