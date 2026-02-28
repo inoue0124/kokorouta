@@ -45,7 +45,7 @@ final class FirestoreClient: Sendable {
         if let afterID {
             let cursorDoc = try await db.collection("tanka").document(afterID).getDocument()
             guard cursorDoc.exists else {
-                throw NetworkError.invalidArgument(message: "指定されたカーソルの短歌が見つかりません。")
+                throw NetworkError.serverError(statusCode: 404)
             }
             query = query.start(afterDocument: cursorDoc)
         }
@@ -155,7 +155,9 @@ final class FirestoreClient: Sendable {
             return updatedCount
         }
 
-        let newLikeCount = result as? Int ?? 0
+        guard let newLikeCount = result as? Int else {
+            throw NetworkError.serverError(statusCode: 500)
+        }
         return LikeResponse(likeCount: newLikeCount)
     }
 
@@ -204,7 +206,9 @@ final class FirestoreClient: Sendable {
             return updatedCount
         }
 
-        let newLikeCount = result as? Int ?? 0
+        guard let newLikeCount = result as? Int else {
+            throw NetworkError.serverError(statusCode: 500)
+        }
         return LikeResponse(likeCount: newLikeCount)
     }
 
