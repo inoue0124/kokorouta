@@ -1,13 +1,3 @@
-# App ID and Apple ID configuration
-#
-# 環境変数で設定する（.env.default や CI シークレットを利用）:
-#   APP_IDENTIFIER  — アプリの Bundle Identifier
-#   APPLE_ID        — Apple Developer アカウントのメールアドレス
-#   TEAM_ID         — Apple Developer Team ID
-#
-app_identifier(ENV["APP_IDENTIFIER"] || "com.example.kokorouta")
-apple_id(ENV["APPLE_ID"] || "your@email.com")
-team_id(ENV["TEAM_ID"] || "YOUR_TEAM_ID")
-
-# For more information about the Appfile, see:
-# https://docs.fastlane.tools/advanced/#appfile
+app_identifier("com.carriage.kokorouta")
+apple_id("inoue-yusuke@carri-age.com")
+team_id("3HFF5L44FR")
