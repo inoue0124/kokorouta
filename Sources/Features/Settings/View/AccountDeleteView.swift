@@ -24,6 +24,8 @@ struct AccountDeleteView: View {
             } else {
                 deleteFormContent(viewModel: viewModel)
             }
+        } else {
+            LoadingView()
         }
     }
 
