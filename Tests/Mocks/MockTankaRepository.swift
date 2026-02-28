@@ -1,11 +1,13 @@
 @testable import App
 import Foundation
 
-final class MockTankaRepository: TankaRepositoryProtocol, @unchecked Sendable {
+@MainActor
+final class MockTankaRepository: TankaRepositoryProtocol {
     var stubbedFeedResponse = FeedResponse(tankaList: [], hasMore: false, nextCursor: nil)
     var stubbedLikeResponse = LikeResponse(likeCount: 0)
     var stubbedGeneratedTanka: Tanka?
     var stubbedMyTankaList: [Tanka] = []
+    var stubbedLikedTankaList: [Tanka] = []
     var stubbedBlockedUsers: [BlockedUser] = []
     var stubbedError: Error?
 
@@ -41,6 +43,11 @@ final class MockTankaRepository: TankaRepositoryProtocol, @unchecked Sendable {
     func fetchMyTanka() async throws -> [Tanka] {
         if let error = stubbedError { throw error }
         return stubbedMyTankaList
+    }
+
+    func fetchLikedTanka() async throws -> [Tanka] {
+        if let error = stubbedError { throw error }
+        return stubbedLikedTankaList
     }
 
     func like(tankaID: String) async throws -> LikeResponse {

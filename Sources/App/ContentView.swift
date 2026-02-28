@@ -13,6 +13,12 @@ struct ContentView: View {
 
             NavigationStack {
                 MyTankaView(selectedTab: $selectedTab)
+                    .navigationDestination(for: MyTankaRoute.self) { route in
+                        switch route {
+                        case .likedTanka:
+                            LikedTankaView()
+                        }
+                    }
             }
             .tag(AppTab.myTanka)
             .tabItem {

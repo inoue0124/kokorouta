@@ -43,6 +43,11 @@ service cloud.firestore {
       }
     }
 
+    // collectionGroup クエリ用: likes サブコレクションの横断読み取り
+    match /{path=**}/likes/{userID} {
+      allow read: if request.auth != null;
+    }
+
     // 通報コレクション（Cloud Functions 経由のみ）
     match /reports/{reportID} {
       allow read, write: if false;

@@ -31,11 +31,17 @@ struct MyTankaView: View {
                     Task { await viewModel.loadMyTanka() }
                 }
             } else if viewModel.tankaList.isEmpty {
-                EmptyStateView(
-                    message: "まだ短歌がありません。\n今日の悩みを詠んでみましょう",
-                    actionLabel: "詠んでみる"
-                ) {
-                    selectedTab = .feed
+                VStack(spacing: 24) {
+                    likedTankaLink
+                        .padding(.horizontal, 20)
+                        .padding(.top, 16)
+
+                    EmptyStateView(
+                        message: "まだ短歌がありません。\n今日の悩みを詠んでみましょう",
+                        actionLabel: "詠んでみる"
+                    ) {
+                        selectedTab = .feed
+                    }
                 }
             } else {
                 tankaList(viewModel: viewModel)
@@ -48,12 +54,33 @@ struct MyTankaView: View {
     private func tankaList(viewModel: MyTankaViewModel) -> some View {
         ScrollView {
             LazyVStack(spacing: 20) {
+                likedTankaLink
+
                 ForEach(viewModel.tankaList) { tanka in
                     TankaCard(tanka: tanka)
                 }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
+        }
+    }
+
+    private var likedTankaLink: some View {
+        NavigationLink(value: MyTankaRoute.likedTanka) {
+            HStack {
+                Image(systemName: "heart.fill")
+                    .foregroundStyle(Color.appSubText)
+                Text("いいねした短歌")
+                    .font(.appBody())
+                    .foregroundStyle(Color.appText)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.appCaption())
+                    .foregroundStyle(Color.appSubText)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .background(Color.appCardBackground, in: RoundedRectangle(cornerRadius: 12))
         }
     }
 }

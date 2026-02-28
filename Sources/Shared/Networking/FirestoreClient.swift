@@ -115,6 +115,8 @@ final class FirestoreClient: Sendable {
 
         // collectionGroup で likes サブコレクションを横断検索
         // likerID フィールドで自分のいいねのみ取得
+        // 注意: 既存データに likerID がない場合はマイグレーションスクリプトで補填が必要
+        // (functions/scripts/backfill-liker-id.ts)
         let likesSnapshot = try await db
             .collectionGroup("likes")
             .whereField("likerID", isEqualTo: uid)
@@ -125,7 +127,10 @@ final class FirestoreClient: Sendable {
         let tankaIDs = likesSnapshot.documents.compactMap { doc -> String? in
             // パス: tanka/{tankaID}/likes/{uid}
             let pathComponents = doc.reference.path.split(separator: "/")
-            guard pathComponents.count >= 2 else { return nil }
+            guard pathComponents.count == 4,
+                  pathComponents[0] == "tanka",
+                  pathComponents[2] == "likes"
+            else { return nil }
             return String(pathComponents[1])
         }
 
