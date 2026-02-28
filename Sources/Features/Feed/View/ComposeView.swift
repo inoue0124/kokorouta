@@ -181,7 +181,7 @@ struct ComposeView: View {
         } label: {
             Text("短歌を詠む")
                 .font(.appBody())
-                .foregroundStyle(viewModel.isValid ? Color.white : Color.appSubText)
+                .foregroundStyle(viewModel.isValid ? Color.appBackground : Color.appSubText)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
                 .background(
@@ -260,7 +260,7 @@ struct ComposeView: View {
             } label: {
                 Text("戻って修正する")
                     .font(.appBody())
-                    .foregroundStyle(Color.white)
+                    .foregroundStyle(Color.appBackground)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
                     .background(Color.appText, in: RoundedRectangle(cornerRadius: 8))

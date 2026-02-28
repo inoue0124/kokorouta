@@ -16,7 +16,7 @@ struct EmptyStateView: View {
                 Button(action: action) {
                     Text(actionLabel)
                         .font(.appBody())
-                        .foregroundStyle(Color.white)
+                        .foregroundStyle(Color.appBackground)
                         .padding(.horizontal, 24)
                         .padding(.vertical, 12)
                         .background(Color.appText, in: Capsule())
