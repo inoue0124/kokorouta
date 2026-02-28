@@ -2,10 +2,36 @@ import Foundation
 
 final class TankaRepository: TankaRepositoryProtocol {
     private let apiClient: APIClient
+    private let firestoreClient: FirestoreClient
 
-    init(apiClient: APIClient = .shared) {
+    init(apiClient: APIClient = .shared, firestoreClient: FirestoreClient = .shared) {
         self.apiClient = apiClient
+        self.firestoreClient = firestoreClient
     }
+
+    // MARK: - 直接 Firestore アクセス
+
+    func fetchFeed(limit: Int, afterID: String?) async throws -> FeedResponse {
+        try await firestoreClient.fetchFeed(limit: limit, afterID: afterID)
+    }
+
+    func fetchMyTanka() async throws -> [Tanka] {
+        try await firestoreClient.fetchMyTanka()
+    }
+
+    func like(tankaID: String) async throws -> LikeResponse {
+        try await firestoreClient.like(tankaID: tankaID)
+    }
+
+    func unlike(tankaID: String) async throws -> LikeResponse {
+        try await firestoreClient.unlike(tankaID: tankaID)
+    }
+
+    func fetchBlockedUsers() async throws -> [BlockedUser] {
+        try await firestoreClient.fetchBlockedUsers()
+    }
+
+    // MARK: - Cloud Functions 経由
 
     func generateTanka(category: WorryCategory, worryText: String) async throws -> Tanka {
         let response: GenerateTankaResponse = try await apiClient.call(
@@ -16,25 +42,6 @@ final class TankaRepository: TankaRepositoryProtocol {
             ]
         )
         return response.tanka
-    }
-
-    func fetchFeed(limit: Int, afterID: String?) async throws -> FeedResponse {
-        var data: [String: Any] = ["limit": limit]
-        if let afterID { data["afterID"] = afterID }
-        return try await apiClient.call("fetchFeed", data: data)
-    }
-
-    func fetchMyTanka() async throws -> [Tanka] {
-        let response: MyTankaResponse = try await apiClient.call("fetchMyTanka")
-        return response.tankaList
-    }
-
-    func like(tankaID: String) async throws -> LikeResponse {
-        try await apiClient.call("likeTanka", data: ["tankaID": tankaID])
-    }
-
-    func unlike(tankaID: String) async throws -> LikeResponse {
-        try await apiClient.call("unlikeTanka", data: ["tankaID": tankaID])
     }
 
     func report(tankaID: String, reason: ReportReason) async throws {
@@ -53,11 +60,6 @@ final class TankaRepository: TankaRepositoryProtocol {
 
     func unblockUser(userID: String) async throws {
         try await apiClient.callVoid("unblockUser", data: ["userID": userID])
-    }
-
-    func fetchBlockedUsers() async throws -> [BlockedUser] {
-        let response: BlockedUsersResponse = try await apiClient.call("fetchBlockedUsers")
-        return response.blockedUsers
     }
 
     func deleteAccount() async throws {

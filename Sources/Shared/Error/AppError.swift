@@ -37,7 +37,21 @@ enum AppError: Error, Sendable, LocalizedError {
         } else if let appError = error as? Self {
             self = appError
         } else {
-            self = .unknown(error.localizedDescription)
+            let nsError = error as NSError
+            if nsError.domain == "FIRFirestoreErrorDomain" {
+                switch nsError.code {
+                case 7: // PERMISSION_DENIED
+                    self = .network(.unauthorized)
+                case 14: // UNAVAILABLE
+                    self = .network(.noConnection)
+                case 4: // DEADLINE_EXCEEDED
+                    self = .network(.timeout)
+                default:
+                    self = .unknown(error.localizedDescription)
+                }
+            } else {
+                self = .unknown(error.localizedDescription)
+            }
         }
     }
 }

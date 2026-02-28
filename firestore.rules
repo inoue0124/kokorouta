@@ -2,11 +2,50 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // All operations require authentication.
-    // Client direct reads/writes are denied by default.
-    // Cloud Functions use Admin SDK so they bypass these rules.
-    match /{document=**} {
-      allow read, write: if request.auth != null && false;
+
+    // 短歌コレクション
+    match /tanka/{tankaID} {
+      // 認証済みユーザーは読み取り可能
+      allow read: if request.auth != null;
+
+      // クライアントからの直接作成・削除は不可（Cloud Functions 経由のみ）
+      allow create, delete: if false;
+
+      // likeCount のみ更新可能（Transaction 経由で likes サブコレクションと同時に更新）
+      allow update: if request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeCount'])
+        && request.resource.data.likeCount is int
+        && request.resource.data.likeCount >= 0;
+
+      // いいねサブコレクション
+      match /likes/{userID} {
+        // 認証済みユーザーは読み取り可能
+        allow read: if request.auth != null;
+
+        // 自分の ID のドキュメントのみ作成・削除可能
+        allow create: if request.auth != null && request.auth.uid == userID;
+        allow delete: if request.auth != null && request.auth.uid == userID;
+      }
+    }
+
+    // ユーザーコレクション
+    match /users/{userID} {
+      // 自分のドキュメントのみ読み取り可能
+      allow read: if request.auth != null && request.auth.uid == userID;
+
+      // ブロックユーザーサブコレクション
+      match /blockedUsers/{blockedID} {
+        // 自分のブロックリストのみ読み取り可能
+        allow read: if request.auth != null && request.auth.uid == userID;
+
+        // 作成・削除は Cloud Functions 経由のみ
+        allow create, delete: if false;
+      }
+    }
+
+    // 通報コレクション（Cloud Functions 経由のみ）
+    match /reports/{reportID} {
+      allow read, write: if false;
     }
   }
 }
