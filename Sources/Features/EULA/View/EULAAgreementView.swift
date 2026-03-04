@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct EULAAgreementView: View {
-    var onAgree: @MainActor () -> Void
+    var onAgree: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {

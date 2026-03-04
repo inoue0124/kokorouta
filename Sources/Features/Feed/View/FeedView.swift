@@ -8,7 +8,7 @@ struct FeedView: View {
     @State private var showReportSheet = false
     @State private var showBlockAlert = false
     @State private var showEULAAgreement = false
-    @AppStorage("hasAgreedToEULA") private var hasAgreedToEULA = false
+    @AppStorage(EULAStorage.key) private var hasAgreedToEULA = false
 
     var body: some View {
         content
@@ -32,11 +32,14 @@ struct FeedView: View {
                     .presentationDetents([.medium])
                 }
             }
-            .sheet(isPresented: $showEULAAgreement) {
+            .sheet(isPresented: $showEULAAgreement, onDismiss: {
+                if hasAgreedToEULA {
+                    path.append(FeedRoute.compose)
+                }
+            }) {
                 EULAAgreementView {
                     hasAgreedToEULA = true
                     showEULAAgreement = false
-                    path.append(FeedRoute.compose)
                 }
             }
             .alert(
