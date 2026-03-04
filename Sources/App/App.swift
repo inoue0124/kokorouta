@@ -6,6 +6,7 @@ import SwiftUI
 @main
 struct MainApp: SwiftUI.App {
     @State private var isAuthReady = false
+    @AppStorage("hasAgreedToEULA") private var hasAgreedToEULA = false
 
     static let isEmulator = ProcessInfo.processInfo.environment["USE_EMULATOR"] == "1"
 
@@ -25,10 +26,14 @@ struct MainApp: SwiftUI.App {
     var body: some Scene {
         WindowGroup {
             Group {
-                if isAuthReady {
-                    ContentView()
-                } else {
+                if !isAuthReady {
                     LoadingView(message: "準備中...")
+                } else if !hasAgreedToEULA {
+                    EULAAgreementView {
+                        hasAgreedToEULA = true
+                    }
+                } else {
+                    ContentView()
                 }
             }
             .background(Color.appBackground.ignoresSafeArea())
