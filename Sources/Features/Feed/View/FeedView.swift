@@ -7,6 +7,8 @@ struct FeedView: View {
     @State private var viewModel: FeedViewModel?
     @State private var showReportSheet = false
     @State private var showBlockAlert = false
+    @State private var showEULAAgreement = false
+    @AppStorage("hasAgreedToEULA") private var hasAgreedToEULA = false
 
     var body: some View {
         content
@@ -28,6 +30,13 @@ struct FeedView: View {
                         try await viewModel?.report(tankaID: target.id, reason: reason)
                     }
                     .presentationDetents([.medium])
+                }
+            }
+            .sheet(isPresented: $showEULAAgreement) {
+                EULAAgreementView {
+                    hasAgreedToEULA = true
+                    showEULAAgreement = false
+                    path.append(FeedRoute.compose)
                 }
             }
             .alert(
@@ -61,7 +70,7 @@ struct FeedView: View {
                     message: "まだ短歌がありません",
                     actionLabel: "最初の短歌を詠む"
                 ) {
-                    path.append(FeedRoute.compose)
+                    navigateToCompose()
                 }
             } else {
                 feedList(viewModel: viewModel)
@@ -122,6 +131,14 @@ struct FeedView: View {
         }
     }
 
+    private func navigateToCompose() {
+        if hasAgreedToEULA {
+            path.append(FeedRoute.compose)
+        } else {
+            showEULAAgreement = true
+        }
+    }
+
     private var composeButton: some View {
         VStack(spacing: 8) {
             if hasReachedDailyLimit {
@@ -130,7 +147,7 @@ struct FeedView: View {
                     .foregroundStyle(Color.appSubText)
             }
             FloatingActionButton {
-                path.append(FeedRoute.compose)
+                navigateToCompose()
             }
             .disabled(hasReachedDailyLimit)
             .opacity(hasReachedDailyLimit ? 0.4 : 1.0)
