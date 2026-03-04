@@ -16,6 +16,10 @@ struct SettingsView: View {
             .listRowBackground(Color.appCardBackground)
 
             Section("情報") {
+                NavigationLink(value: SettingsRoute.eula) {
+                    Label("利用規約", systemImage: "doc.text")
+                }
+
                 HStack {
                     Text("バージョン")
                     Spacer()

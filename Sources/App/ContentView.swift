@@ -33,6 +33,8 @@ struct ContentView: View {
                             BlockListView()
                         case .accountDelete:
                             AccountDeleteView()
+                        case .eula:
+                            EULAContentView()
                         }
                     }
             }

@@ -31,6 +31,7 @@ final class AccountDeleteViewModel {
         }
         // サーバー側のデータ削除は完了済みのため、ローカルのサインアウト失敗は無視する
         try? Auth.auth().signOut()
+        EULAStorage.reset()
         isDeleting = false
         isDeleted = true
         // Show confirmation briefly before resetting app
