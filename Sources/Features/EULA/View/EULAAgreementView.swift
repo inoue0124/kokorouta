@@ -1,9 +1,7 @@
 import SwiftUI
 
 struct EULAAgreementView: View {
-    @State private var viewModel = EULAAgreementViewModel()
-
-    var onAgree: () -> Void
+    var onAgree: @MainActor () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -23,7 +21,6 @@ struct EULAAgreementView: View {
 
             VStack(spacing: 12) {
                 Button {
-                    viewModel.agree()
                     onAgree()
                 } label: {
                     Text("同意して始める")
